@@ -1,7 +1,7 @@
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Badge } from './ui/badge';
-import { Check, Gift, Calendar, MessageCircle } from 'lucide-react';
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
+import { Check, Gift, Calendar, MessageCircle } from "lucide-react";
 
 export function FreeDiagnostic() {
   return (
@@ -16,21 +16,23 @@ export function FreeDiagnostic() {
               Бесплатно
             </Badge>
           </div>
-          
+
           <CardHeader className="text-center pt-8 pb-6">
             <CardTitle className="text-2xl md:text-3xl mb-3">
               Бесплатная диагностика вокальных данных
             </CardTitle>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Узнайте свои сильные стороны и зоны роста за 20-30 минут. 
-              Никаких обязательств — просто честная оценка ваших возможностей.
+              Узнайте свои сильные стороны и зоны роста за 20-30 минут. Никаких
+              обязательств — просто честная оценка ваших возможностей.
             </p>
           </CardHeader>
 
           <CardContent className="pb-8">
             {/* Что входит в диагностику */}
             <div className="mb-8">
-              <h4 className="text-center mb-6 font-medium text-foreground">Что вы получите:</h4>
+              <h4 className="text-center mb-6 font-medium text-foreground">
+                Что вы получите:
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 <div className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
@@ -67,22 +69,26 @@ export function FreeDiagnostic() {
 
             {/* CTA кнопки */}
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <Button 
+              <Button
                 size="lg"
                 className="flex-1 min-h-[48px] bg-secondary hover:bg-secondary/90 text-secondary-foreground"
                 onClick={() => {
-                  document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("book")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 Записаться на диагностику
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 className="flex-1 min-h-[48px] border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground"
                 onClick={() => {
-                  window.open('https://wa.me/79277212376?text=Привет! Хочу записаться на бесплатную диагностику вокальных данных', '_blank');
+                  document
+                    .getElementById("book")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
@@ -93,7 +99,7 @@ export function FreeDiagnostic() {
             {/* Дополнительная информация */}
             <div className="mt-6 text-center">
               <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-                Диагностика проходит онлайн в Microsoft Teams. 
+                Диагностика проходит онлайн в Microsoft Teams.
                 Продолжительность: 20-30 минут. Запись по желанию.
               </p>
             </div>

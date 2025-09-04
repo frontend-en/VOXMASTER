@@ -1,32 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sun, Moon } from 'lucide-react';
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(true); // Will be updated on mount
+   const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+  useEffect(() => setMounted(true), []);
 
-  // Sync state with current theme on mount
-  useEffect(() => {
-    const root = document.documentElement;
-    const currentlyDark = root.classList.contains('dark');
-    setIsDark(currentlyDark);
-  }, []);
+  if (!mounted) {
+    // пока не смонтировались — рендерим пустую кнопку, чтобы не было «рывка» иконки
+    return (
+      <motion.button className="theme-toggle-btn" aria-label="Переключить тему" />
+    );
+  }
+
+  const isDark = (resolvedTheme ?? theme) !== 'light';
 
   const handleToggle = () => {
     setIsAnimating(true);
-    setIsDark(!isDark);
+    setTheme(isDark ? 'light' : 'dark'); // всё управление — через провайдер
     setTimeout(() => setIsAnimating(false), 600);
   };
 
@@ -47,7 +42,7 @@ export function ThemeToggle() {
           : '0 0 15px rgba(245, 158, 11, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1)',
         rotate: isAnimating ? [0, -15, 15, 0] : 0
       }}
-      transition={{ duration: isAnimating ? 0.6 : 0.3 }}
+      transition={{ duration: isAnimating ? 0.1 : 0.1 }}
     >
       <div className="theme-icon-container">
         <AnimatePresence mode="wait">

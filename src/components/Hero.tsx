@@ -64,7 +64,7 @@ export function Hero() {
                 size="lg"
                 className="w-full sm:w-auto border border-border btn-micro min-h-[44px]"
                 onClick={() => {
-                  window.open('https://t.me/garderik', '_blank');
+                  document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />

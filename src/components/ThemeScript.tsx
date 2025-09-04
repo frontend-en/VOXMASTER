@@ -4,25 +4,19 @@ export function ThemeScript() {
     (function() {
       try {
         var theme = localStorage.getItem('theme');
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
-        if (theme === 'dark' || (!theme && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        } else {
+        if (theme === 'light') {
           document.documentElement.classList.remove('dark');
+        } else {
+          // По умолчанию всегда тёмная
+          document.documentElement.classList.add('dark');
         }
       } catch (e) {
-        // Fallback to dark theme if localStorage is not available
+        // Fallback — всегда тёмная
         document.documentElement.classList.add('dark');
       }
     })();
   `;
 
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: script,
-      }}
-    />
-  );
+  return <script dangerouslySetInnerHTML={{ __html: script }} />;
 }

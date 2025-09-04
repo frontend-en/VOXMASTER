@@ -526,7 +526,7 @@ export function Testimonials() {
   };
 
   return (
-    <section className="py-24 px-4">
+    <section className="py-8 lg:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="mb-4 mx-auto">Отзывы учеников</h2>

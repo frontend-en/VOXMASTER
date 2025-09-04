@@ -105,7 +105,7 @@ export function Header() {
             </nav>
 
             {/* Right controls + Mobile burger */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6">
               <ThemeToggle />
               <Button
                 size="sm"
