@@ -5071,7 +5071,7 @@
   --text-max-width: 68ch;
   --hero-text-max-width: 58ch;
   --header-height-desktop: 64px;
-  --header-height-mobile: 56px;
+  --header-height-mobile: 32px;
   --background: #fff;
   --foreground: #333;
   --card: #fff;
@@ -5331,16 +5331,6 @@ html {
       height: 20px;
     }
 
-    .sun-rays {
-      width: 36px;
-      height: 36px;
-    }
-
-    .sun-ray {
-      height: 6px;
-      transform-origin: 50% 20px;
-    }
-
     .moon-glow {
       width: 28px;
       height: 28px;
@@ -5501,16 +5491,15 @@ html {
 
   .hero-v2 {
     min-height: calc(100vh - var(--header-height-mobile));
-    padding-top: calc(var(--header-height-mobile)  + 24px);
+    padding-top: calc(var(--header-height-mobile));
     align-items: center;
-    padding-bottom: 3rem;
+    padding-bottom: 1rem;
     display: flex;
   }
 
   @media (width >= 1024px) {
     .hero-v2 {
       min-height: calc(100vh - var(--header-height-desktop));
-      padding-top: calc(var(--header-height-desktop)  + 32px);
       padding-bottom: 4rem;
     }
   }
@@ -5518,7 +5507,6 @@ html {
   @media (width <= 480px) and (height <= 700px) {
     .hero-v2 {
       min-height: calc(100vh - var(--header-height-mobile));
-      padding-top: calc(var(--header-height-mobile)  + 16px);
       padding-bottom: 2rem;
     }
   }

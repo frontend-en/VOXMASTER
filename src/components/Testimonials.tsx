@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState, KeyboardEvent } from "react";
 import { Card, CardContent } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
-import { Star, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Star,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 export function Testimonials() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -281,7 +287,7 @@ export function Testimonials() {
     // Возобновляем автопрокрутку через 6 секунд после клика
     pauseTimeoutRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 6000);
+    }, 7000);
   };
 
   // Обновляем активную страницу при изменении позиции скролла
@@ -476,6 +482,19 @@ export function Testimonials() {
     return text.length > maxCharsInCollapsed;
   };
 
+  // ниже остальных хуков
+  const handlePrev = () => {
+    const pages = getTotalPages();
+    const prev = (activeSlide - 1 + pages) % pages;
+    goToSlide(prev);
+  };
+
+  const handleNext = () => {
+    const pages = getTotalPages();
+    const next = (activeSlide + 1) % pages;
+    goToSlide(next);
+  };
+
   return (
     <section className="py-24 px-4">
       <div className="max-w-6xl mx-auto">
@@ -560,38 +579,71 @@ export function Testimonials() {
           </ScrollArea>
         </div>
 
-        {/* Пагинация - показываем только если больше одной страницы */}
+        {/* Навигация стрелками снизу */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-12">
+          <div className="mt-8 sm:mt-12 flex justify-center">
             <div
-              className="flex space-x-2"
-              role="tablist"
-              aria-label="Навигация по страницам отзывов"
+              className="inline-flex items-center gap-3"
+              role="group"
+              aria-label="Навигация отзывов"
             >
-              {Array.from({ length: totalPages }, (_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  className={`
-                    rounded-full transition-all duration-200 cursor-pointer select-none
-                    focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                    focus:ring-offset-background active:scale-95
-                    ${
-                      index === activeSlide
-                        ? "w-6 h-3 bg-primary shadow-md shadow-primary/30"
-                        : "w-3 h-3 bg-muted-foreground/50 hover:bg-muted-foreground/80 hover:scale-110"
-                    }
-                  `}
-                  aria-label={`Перейти к странице ${
-                    index + 1
-                  } из ${totalPages}`}
-                  aria-current={index === activeSlide ? "true" : "false"}
-                  tabIndex={0}
-                  role="tab"
-                  aria-selected={index === activeSlide}
-                />
-              ))}
+              <button
+                type="button"
+                onClick={handlePrev}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    handlePrev();
+                  }
+                  if (e.key === "ArrowRight") {
+                    e.preventDefault();
+                    handleNext();
+                  }
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handlePrev();
+                  }
+                }}
+                className="
+          h-11 px-4 rounded-full border border-border/60 bg-background/70
+          hover:bg-accent hover:text-accent-foreground
+          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background
+          active:scale-95 transition
+        "
+                aria-label="Предыдущий отзыв"
+              >
+                <span className="sr-only">Назад</span>
+                <ChevronLeft className="w-5 h-5" aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNext}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowRight") {
+                    e.preventDefault();
+                    handleNext();
+                  }
+                  if (e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    handlePrev();
+                  }
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleNext();
+                  }
+                }}
+                className="
+          h-11 px-4 rounded-full border border-border/60 bg-background/70
+          hover:bg-accent hover:text-accent-foreground
+          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background
+          active:scale-95 transition
+        "
+                aria-label="Следующий отзыв"
+              >
+                <span className="sr-only">Вперёд</span>
+                <ChevronRight className="w-5 h-5" aria-hidden="true" />
+              </button>
             </div>
           </div>
         )}

@@ -630,36 +630,6 @@ html {
     }
   }
 
-  /* Hero V2 styles */
-  .hero-v2 {
-    /* Full viewport height minus header */
-    min-height: calc(100vh - var(--header-height-mobile));
-    /* Mobile: header height (56px) + 24px = 80px */
-    padding-top: calc(var(--header-height-mobile) + 24px);
-    padding-bottom: 3rem;
-    display: flex;
-    align-items: center;
-  }
-
-  @media (min-width: 1024px) {
-    .hero-v2 {
-      /* Full viewport height minus header */
-      min-height: calc(100vh - var(--header-height-desktop));
-      /* Desktop: header height (64px) + 32px = 96px */
-      padding-top: calc(var(--header-height-desktop) + 32px);
-      padding-bottom: 4rem;
-    }
-  }
-
-  /* Ensure proper spacing on very small screens */
-  @media (max-width: 480px) and (max-height: 700px) {
-    .hero-v2 {
-      min-height: calc(100vh - var(--header-height-mobile));
-      padding-top: calc(var(--header-height-mobile) + 16px);
-      padding-bottom: 2rem;
-    }
-  }
-
   .hero-container {
     max-width: 1100px;
     margin: 0 auto;
