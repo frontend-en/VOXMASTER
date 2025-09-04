@@ -266,6 +266,10 @@ export function Testimonials() {
       clearTimeout(pauseTimeoutRef.current);
     }
 
+    resetExpandedState();
+    setIsPaused(true); // как было
+    setActiveSlide(pageIndex);
+
     // Ставим автопрокрутку на паузу
     setIsPaused(true);
 
@@ -279,6 +283,8 @@ export function Testimonials() {
     const maxScrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth;
     const newPosition = Math.min(targetPosition, maxScrollLeft);
 
+    resetExpandedState();
+
     scrollArea.scrollTo({
       left: newPosition,
       behavior: "smooth",
@@ -290,14 +296,29 @@ export function Testimonials() {
     }, 7000);
   };
 
+  const resetCardHeights = () => {
+    const scrollArea = getScrollArea();
+    if (!scrollArea) return;
+    const cards = scrollArea.querySelectorAll<HTMLElement>("[data-card]");
+    cards.forEach((card) => {
+      card.style.height = "";
+      card.style.maxHeight = "";
+      card.removeAttribute("data-expanded");
+    });
+  };
+
+  // Унифицированный сброс «разворотов» + высот
+  const resetExpandedState = () => {
+    setExpandedComments(new Set()); // свернуть все отзывы
+    resetCardHeights(); // очистить инлайновые размеры
+  };
+
   // Обновляем активную страницу при изменении позиции скролла
   const updateActiveSlide = (scrollLeft: number) => {
-    if (isPaused) return; // Не обновляем во время пользовательского взаимодействия
+    if (isPaused) return;
 
     const cardWidth = getCardWidth();
     const currentTotalPages = getTotalPages();
-
-    // Вычисляем текущую страницу на основе прокрутки
     const currentPage = Math.round(scrollLeft / cardWidth);
     const newActiveSlide = Math.max(
       0,
@@ -305,6 +326,8 @@ export function Testimonials() {
     );
 
     if (newActiveSlide !== activeSlide) {
+      // СБРОС при смене страницы вручную
+      resetExpandedState();
       setActiveSlide(newActiveSlide);
     }
   };
@@ -321,21 +344,18 @@ export function Testimonials() {
       const currentTotalPages = getTotalPages();
       const maxScrollLeft = scrollArea.scrollWidth - scrollArea.clientWidth;
 
-      // Обновляем totalPages если изменилось
       if (currentTotalPages !== totalPages) {
         setTotalPages(currentTotalPages);
       }
 
-      // Вычисляем следующую страницу
       const nextPageIndex = (activeSlide + 1) % currentTotalPages;
       const nextPosition = nextPageIndex * cardWidth;
       const newPosition = nextPosition >= maxScrollLeft ? 0 : nextPosition;
 
-      scrollArea.scrollTo({
-        left: newPosition,
-        behavior: "smooth",
-      });
+      // СБРОС перед перелистыванием
+      resetExpandedState();
 
+      scrollArea.scrollTo({ left: newPosition, behavior: "smooth" });
       setActiveSlide(nextPageIndex);
     }, 4000); // Прокрутка каждые 4 секунды
 
@@ -448,11 +468,21 @@ export function Testimonials() {
   const toggleComment = (index: number) => {
     setExpandedComments((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
+      const wasExpanded = newSet.has(index);
+      const scrollArea = getScrollArea();
+      const card =
+        scrollArea?.querySelectorAll<HTMLElement>("[data-card]")?.[index];
+      if (card) {
+        if (wasExpanded) {
+          card.removeAttribute("data-expanded");
+          card.style.maxHeight = ""; // если анимировали
+        } else {
+          card.setAttribute("data-expanded", "true");
+          card.style.maxHeight = ""; // анимация «до auto» — если используете
+        }
       }
+      if (wasExpanded) newSet.delete(index);
+      else newSet.add(index);
       return newSet;
     });
   };
@@ -532,7 +562,7 @@ export function Testimonials() {
                     <div className="testimonial-text">
                       <div className="mb-6 ml-2">
                         <p
-                          className={`text-base sm:text-lg leading-relaxed ${
+                          className={`text-base text-sm lg:text-lg leading-relaxed ${
                             expandedComments.has(index) ? "" : "line-clamp-4"
                           }`}
                         >
@@ -567,9 +597,9 @@ export function Testimonials() {
                         )}
                       </div>
 
-                      <div className="flex justify-between items-center text-base text-muted-foreground mt-auto pt-5 border-t border-border/30">
-                        <span className="font-medium">{testimonial.name}</span>
-                        <span className="text-base">{testimonial.date}</span>
+                      <div className="flex justify-between items-center text-sm lg:text-lg  text-muted-foreground mt-auto pt-5 border-t border-border/30">
+                        <span>{testimonial.name}</span>
+                        <span>{testimonial.date}</span>
                       </div>
                     </div>
                   </CardContent>

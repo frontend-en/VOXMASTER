@@ -5454,7 +5454,7 @@ html {
 
   @media (width <= 639px) {
     .testimonial-card {
-      min-height: 400px;
+      min-height: 300px;
     }
   }
 
