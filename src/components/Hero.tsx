@@ -1,8 +1,8 @@
+import { MessageCircle, Phone, ArrowDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { VideoFrame } from './VideoFrame';
 import { BulletItem } from './BulletItem';
-import { MessageCircle, Phone, ArrowDown } from 'lucide-react';
 
 export function Hero() {
   return (

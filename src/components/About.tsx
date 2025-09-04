@@ -1,3 +1,4 @@
+import * as React from "react";
 import { ExternalLink, Music, Play, CheckCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";

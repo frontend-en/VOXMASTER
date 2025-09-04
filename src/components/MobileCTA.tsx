@@ -1,5 +1,5 @@
-import { Button } from './ui/button';
 import { MessageCircle } from 'lucide-react';
+import { Button } from './ui/button';
 
 export function MobileCTA() {
   return (

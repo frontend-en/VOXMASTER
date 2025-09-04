@@ -1,7 +1,7 @@
+import { Check, CreditCard, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Check, CreditCard, HelpCircle } from 'lucide-react';
 
 export function Pricing() {
   return (
