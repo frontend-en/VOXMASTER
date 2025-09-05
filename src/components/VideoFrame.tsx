@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { AlertTriangle, Loader2, Play } from "lucide-react";
+import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
+import Loader2 from "lucide-react/dist/esm/icons/loader-2";
+import Play from "lucide-react/dist/esm/icons/play";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { videoposter } from "../assets";
 

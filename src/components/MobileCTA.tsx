@@ -1,4 +1,4 @@
-import { MessageCircle } from 'lucide-react';
+import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
 import { Button } from './ui/button';
 
 export function MobileCTA() {

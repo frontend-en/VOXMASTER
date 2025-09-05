@@ -1,4 +1,6 @@
-import { MessageCircle, Phone, ArrowDown } from 'lucide-react';
+import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
+import Phone from "lucide-react/dist/esm/icons/phone";
+import ArrowDown from "lucide-react/dist/esm/icons/arrow-down";
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { VideoFrame } from './VideoFrame';

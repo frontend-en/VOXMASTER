@@ -3,7 +3,8 @@ import Headroom from "react-headroom";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetFooter, SheetHeader, SheetTitle } from "./ui/sheet";
-import { Menu, Music } from "lucide-react";
+import Menu from "lucide-react/dist/esm/icons/menu";
+import Music from "lucide-react/dist/esm/icons/music";
 
 type NavItem = { id: string; label: string };
 const NAV: NavItem[] = [

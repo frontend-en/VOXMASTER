@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
-import { MessageCircle, Phone } from "lucide-react";
+import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
+import Phone from "lucide-react/dist/esm/icons/phone";
 
 type Errors = Partial<
   Record<"name" | "contact" | "goal" | "comment" | "consent", string>

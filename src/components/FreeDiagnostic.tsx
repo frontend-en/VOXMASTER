@@ -1,7 +1,10 @@
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Check, Gift, Calendar, MessageCircle } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
+import Gift from "lucide-react/dist/esm/icons/gift";
+import Calendar from "lucide-react/dist/esm/icons/calendar";
+import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
 
 export function FreeDiagnostic() {
   return (

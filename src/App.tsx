@@ -8,13 +8,10 @@ import { FAQ } from './components/FAQ';
 import { About } from './components/About';
 import { Footer } from './components/Footer';
 import { MobileCTA } from './components/MobileCTA';
-import { ThemeScript } from './components/ThemeScript';
-import { BackgroundDecor } from './components/BackgroundDecor';
 
 export default function App() {
   return (
     <>
-      <ThemeScript />
       <div className="min-h-screen bg-background text-foreground relative">
         {/* <BackgroundDecor /> */}
         <Header />

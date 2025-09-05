@@ -1,4 +1,6 @@
-import { Check, CreditCard, HelpCircle } from 'lucide-react';
+import Check from "lucide-react/dist/esm/icons/check";
+import CreditCard from "lucide-react/dist/esm/icons/credit-card";
+import HelpCircle from "lucide-react/dist/esm/icons/help-circle";
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';

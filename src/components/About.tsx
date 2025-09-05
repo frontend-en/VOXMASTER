@@ -1,5 +1,7 @@
-import * as React from "react";
-import { ExternalLink, Music, Play, CheckCircle } from "lucide-react";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
+import Music from "lucide-react/dist/esm/icons/music";
+import Play from "lucide-react/dist/esm/icons/play";
+import CheckCircle from "lucide-react/dist/esm/icons/check-circle";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { poster, poster1 } from "../assets";
@@ -15,23 +17,28 @@ export function About() {
   const musicLinks = [
     {
       platform: "YouTube",
-      url: "https://youtube.com/@voxmaster",
+      url: "https://www.youtube.com/channel/UCy9gI1psMdd8YXBgjibqDFg",
       icon: Play,
     },
     {
+      platform: "Яндекс Музыка",
+      url: "https://music.yandex.ru/artist/6293883",
+      icon: Music,
+    },
+    {
       platform: "Spotify",
-      url: "https://open.spotify.com/artist/voxmaster",
+      url: "https://open.spotify.com/artist/4aX01LqumAS6ImfPONFsUU",
       icon: Music,
     },
     {
       platform: "Apple Music",
-      url: "https://music.apple.com/artist/voxmaster",
+      url: "https://music.apple.com/ru/artist/танцы-сознания/1441236784",
       icon: Music,
     },
     {
-      platform: "Яндекс Музыка",
-      url: "https://music.yandex.ru/artist/voxmaster",
-      icon: Music,
+      platform: "vk",
+      url: "https://vk.com/danceofmind",
+      icon: Play,
     },
   ];
 
