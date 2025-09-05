@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
@@ -13,8 +12,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
-import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
-import Phone from "lucide-react/dist/esm/icons/phone";
+import { MessageCircle, Phone } from "lucide-react";
 
 type Errors = Partial<
   Record<"name" | "contact" | "goal" | "comment" | "consent", string>
@@ -35,12 +33,6 @@ export function ContactForm() {
   });
   const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // hCaptcha
-  const captchaRef = useRef<any>(null);
-const sitekey = import.meta.env.VITE_HCAPTCHA_SITEKEY as string;
-  const [pendingAction, setPendingAction] = useState<"whatsapp" | "telegram" | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   // Анти-спам: honeypot + минимальное время + локальный rate-limit
   const [website, setWebsite] = useState(""); // honeypot
@@ -153,16 +145,6 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
     return { ok: true as const };
   };
 
-  const doAction = (action: "whatsapp" | "telegram") => {
-    if (action === "whatsapp") openWhatsApp();
-    else openTelegram();
-
-    // Сброс токена после действия
-    setCaptchaToken(null);
-    captchaRef.current?.resetCaptcha?.();
-    setPendingAction(null);
-  };
-
   const handlePreSubmit = (action: "whatsapp" | "telegram") => {
     setIsSubmitting(true);
     try {
@@ -170,27 +152,15 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
 
       const anti = passAntiSpam();
       if (!anti.ok) {
-        if (anti.reason === "too_fast") alert("Слишком быстро. Заполните форму честно 😊");
-        if (anti.reason === "rate_limited") alert("Слишком часто. Попробуйте через минуту.");
+        if (anti.reason === "too_fast")
+          alert("Слишком быстро. Заполните форму честно 😊");
+        if (anti.reason === "rate_limited")
+          alert("Слишком часто. Попробуйте через минуту.");
         return;
       }
 
-      // Запоминаем намерение и запускаем невидимую капчу
-      setPendingAction(action);
-
-      if (!sitekey) {
-        // На случай, если забыли ключ — не ломаем UX
-        console.warn("HCaptcha sitekey не задан. Пропускаем проверку.");
-        doAction(action);
-        return;
-      }
-
-      // Если есть свежий токен — действуем сразу; иначе просим hCaptcha
-      if (captchaToken) {
-        doAction(action);
-      } else {
-        captchaRef.current?.execute?.();
-      }
+      if (action === "whatsapp") openWhatsApp();
+      else openTelegram();
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +181,7 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                 className="space-y-6"
                 noValidate
               >
-                {/* HONEYPOT (скрытое поле для ботов) */}
+                {/* honeypot */}
                 <div className="hidden">
                   <label htmlFor="website">Ваш сайт</label>
                   <input
@@ -335,28 +305,6 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                 </div>
                 {errors.consent && (
                   <p className="text-sm text-destructive">{errors.consent}</p>
-                )}
-
-                {/* HCaptcha — невидимый виджет */}
-                {sitekey && (
-                  <HCaptcha
-                    ref={captchaRef}
-                    sitekey={sitekey}
-                    size="invisible"
-                    onVerify={(token: string /*, ekey: string*/) => {
-                      setCaptchaToken(token);
-                      if (pendingAction) doAction(pendingAction);
-                    }}
-                    onExpire={() => {
-                      setCaptchaToken(null);
-                    }}
-                    onError={(err: unknown) => {
-                      console.warn("HCaptcha error:", err);
-                      alert("Проверка не прошла. Попробуйте ещё раз.");
-                      setCaptchaToken(null);
-                      captchaRef.current?.resetCaptcha?.();
-                    }}
-                  />
                 )}
 
                 <div className="grid grid-cols-1 gap-3 pt-4">

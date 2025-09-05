@@ -1,47 +1,12 @@
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
-import Music from "lucide-react/dist/esm/icons/music";
-import Play from "lucide-react/dist/esm/icons/play";
 import CheckCircle from "lucide-react/dist/esm/icons/check-circle";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { poster, poster1 } from "../assets";
 import { ImageCarousel } from "./ImageCarousel";
+import { benefits, musicLinks } from "../lib/consts";
 
 export function About() {
-  const benefits = [
-    "Пишу тексты и музыку, делаю аранжировки",
-    "Делаю сведение и подбираю референсы под трек",
-    "Подхожу рационально: без «магии», только то, что работает",
-  ];
-
-  const musicLinks = [
-    {
-      platform: "YouTube",
-      url: "https://www.youtube.com/channel/UCy9gI1psMdd8YXBgjibqDFg",
-      icon: Play,
-    },
-    {
-      platform: "Яндекс Музыка",
-      url: "https://music.yandex.ru/artist/6293883",
-      icon: Music,
-    },
-    {
-      platform: "Spotify",
-      url: "https://open.spotify.com/artist/4aX01LqumAS6ImfPONFsUU",
-      icon: Music,
-    },
-    {
-      platform: "Apple Music",
-      url: "https://music.apple.com/ru/artist/танцы-сознания/1441236784",
-      icon: Music,
-    },
-    {
-      platform: "vk",
-      url: "https://vk.com/danceofmind",
-      icon: Play,
-    },
-  ];
-
   return (
     <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">

@@ -228,6 +228,7 @@ export function VideoFrame() {
       {!playing && (
         <>
           <ImageWithFallback
+            loading="lazy"
             src={videoposter}
             alt="Видео: как проходит урок"
             className="absolute inset-0 w-full h-full object-cover"

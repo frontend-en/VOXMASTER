@@ -78,11 +78,11 @@ export function ImageCarousel({
           <div key={idx} className="w-full shrink-0">
             {/* ВАЖНО: высоту задаёт картинка — без object-cover */}
             <img
+              loading="lazy"
               ref={(el) => setImgRef(el, idx)}
               src={img.src}
               alt={img.alt ?? ""}
               className={cn("block w-full h-[400px] object-cover", rounded, img.className)}
-              loading={idx === 0 ? "eager" : "lazy"}
               decoding="async"
             />
           </div>
