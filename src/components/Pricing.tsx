@@ -1,16 +1,26 @@
-import Check from "lucide-react/dist/esm/icons/check";
-import CreditCard from "lucide-react/dist/esm/icons/credit-card";
-import HelpCircle from "lucide-react/dist/esm/icons/help-circle";
+import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
+import { Check, CreditCard, HelpCircle } from 'lucide-react';
+import { PaymentModal } from './PaymentModal';
 
 export function Pricing() {
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<{
+    title: string;
+    price: string;
+  } | null>(null);
+
+  const handlePaymentClick = (planTitle: string, planPrice: string) => {
+    setSelectedPlan({ title: planTitle, price: planPrice });
+    setIsPaymentModalOpen(true);
+  };
   return (
     <section className="py-8 px-4 md:py-8 lg:py-8" style={{
       paddingTop: 'calc(var(--header-height-mobile) + 24px)',
     }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto pricing-section">
         {/* Кикер и заголовок */}
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm font-medium mb-4">
@@ -69,7 +79,10 @@ export function Pricing() {
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <div className="flex flex-col gap-3 w-full">
-                <Button className="w-full min-h-[44px]">
+                <Button 
+                  className="w-full min-h-[44px]"
+                  onClick={() => handlePaymentClick('Урок вокала', '3000 ₽')}
+                >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Оплатить урок
                 </Button>
@@ -125,7 +138,10 @@ export function Pricing() {
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <div className="flex flex-col gap-3 w-full">
-                <Button className="w-full min-h-[44px]">
+                <Button 
+                  className="w-full min-h-[44px]"
+                  onClick={() => handlePaymentClick('Урок сонграйтинга', '3000 ₽')}
+                >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Оплатить урок
                 </Button>
@@ -181,7 +197,10 @@ export function Pricing() {
             </CardContent>
             <CardFooter className="flex flex-col gap-3">
               <div className="flex flex-col gap-3 w-full">
-                <Button className="w-full min-h-[44px]">
+                <Button 
+                  className="w-full min-h-[44px]"
+                  onClick={() => handlePaymentClick('Урок прикладной теории', '3000 ₽')}
+                >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Оплатить урок
                 </Button>
@@ -255,9 +274,7 @@ export function Pricing() {
               <div className="flex flex-col gap-2.5 sm:gap-3">
                 <Button 
                   className="w-full min-h-[44px]"
-                  onClick={() => {
-                    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  onClick={() => handlePaymentClick('4 занятия', '11 000 ₽')}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span className="sm:hidden">Выбрать 4</span>
@@ -309,9 +326,7 @@ export function Pricing() {
               <div className="flex flex-col gap-2.5 sm:gap-3">
                 <Button 
                   className="w-full min-h-[44px]"
-                  onClick={() => {
-                    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  onClick={() => handlePaymentClick('8 занятий', '21 000 ₽')}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   <span className="sm:hidden">Выбрать 8</span>
@@ -340,6 +355,13 @@ export function Pricing() {
           </div>
         </div>
       </div>
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        planTitle={selectedPlan?.title}
+        planPrice={selectedPlan?.price}
+      />
     </section>
   );
 }

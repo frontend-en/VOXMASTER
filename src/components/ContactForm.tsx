@@ -11,8 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { Checkbox } from "./ui/checkbox";
 import { MessageCircle, Phone } from "lucide-react";
+import { RequiredLabel } from "./ui/requiredLabel";
 
 type Errors = Partial<
   Record<"name" | "contact" | "goal" | "comment" | "consent", string>
@@ -80,8 +87,7 @@ export function ContactForm() {
     v ? "" : "Нужно согласие на обработку данных";
 
   const setField =
-    (key: keyof typeof formData) =>
-    (value: string | boolean) => {
+    (key: keyof typeof formData) => (value: string | boolean) => {
       setFormData((s) => ({ ...s, [key]: value }));
     };
 
@@ -166,6 +172,13 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
     }
   };
 
+  const isFormValid =
+    !validateName(formData.name) &&
+    !validateContact(formData.contact) &&
+    !validateGoal(formData.goal) &&
+    !validateComment(formData.comment) &&
+    !validateConsent(formData.consent);
+
   return (
     <section className="py-20 px-4 bg-muted/50">
       <div className="max-w-4xl mx-auto">
@@ -194,7 +207,7 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Имя</Label>
+                    <RequiredLabel htmlFor="name">Имя</RequiredLabel>
                     <Input
                       id="name"
                       placeholder="Ваше имя"
@@ -212,7 +225,7 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="contact">Контакт</Label>
+                    <RequiredLabel htmlFor="contact">Контакт</RequiredLabel>
                     <Input
                       id="contact"
                       placeholder="Телефон или @telegram"
@@ -225,7 +238,10 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                       }
                     />
                     {errors.contact && (
-                      <p id="contact-error" className="text-sm text-destructive">
+                      <p
+                        id="contact-error"
+                        className="text-sm text-destructive"
+                      >
                         {errors.contact}
                       </p>
                     )}
@@ -233,7 +249,7 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="goal">Цель</Label>
+                  <RequiredLabel htmlFor="goal">Цель</RequiredLabel>
                   <Select
                     value={formData.goal}
                     onValueChange={(value) => {
@@ -295,40 +311,62 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
                     }}
                     onBlur={() => touchField("consent")}
                   />
-                  <Label
-                    htmlFor="consent"
-                    className="text-sm leading-5 cursor-pointer"
-                  >
-                    Согласен(на) на обработку данных и условия переноса
+                  <RequiredLabel htmlFor="consent">
+                    Согласен(на) на обработку данных и условия переноса занятия
                     (предупреждать за 24 ч)
-                  </Label>
+                  </RequiredLabel>
                 </div>
                 {errors.consent && (
                   <p className="text-sm text-destructive">{errors.consent}</p>
                 )}
 
-                <div className="grid grid-cols-1 gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    disabled={isSubmitting}
-                    onClick={() => handlePreSubmit("whatsapp")}
-                  >
-                    <Phone className="mr-2 h-4 w-4" />
-                    Написать в WhatsApp
-                  </Button>
-
-                  <Button
-                    type="button"
-                    className="w-full"
-                    disabled={isSubmitting}
-                    onClick={() => handlePreSubmit("telegram")}
-                  >
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Написать в Telegram
-                  </Button>
-                </div>
+                <TooltipProvider delayDuration={200}>
+                  <div className="grid grid-cols-1 gap-3 pt-4">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="w-full">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            disabled={!isFormValid || isSubmitting}
+                            onClick={() => handlePreSubmit("whatsapp")}
+                          >
+                            <Phone className="mr-2 h-4 w-4" />
+                            Написать в WhatsApp
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      {!isFormValid && (
+                        <TooltipContent className="max-w-xs text-sm leading-relaxed">
+                          Пожалуйста, заполните все обязательные поля и
+                          подтвердите согласие — тогда кнопка станет доступна.
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="w-full">
+                          <Button
+                            type="button"
+                            className="w-full"
+                            disabled={!isFormValid || isSubmitting}
+                            onClick={() => handlePreSubmit("telegram")}
+                          >
+                            <MessageCircle className="mr-2 h-4 w-4" />
+                            Написать в Telegram
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      {!isFormValid && (
+                        <TooltipContent className="max-w-xs text-sm leading-relaxed">
+                          Заполните имя, контакт, цель и согласие, чтобы
+                          продолжить в Telegram.
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
               </form>
 
               <div className="mt-6 pt-6 border-t">
