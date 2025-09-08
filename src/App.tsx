@@ -5,7 +5,6 @@ import { FreeDiagnostic } from "./components/FreeDiagnostic";
 import { Pricing } from "./components/Pricing";
 import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
-import { MobileCTA } from "./components/MobileCTA";
 
 // ✅ lazy imports
 const About = lazy(() =>
@@ -58,7 +57,6 @@ export default function App() {
         </main>
 
         <Footer />
-        <MobileCTA />
       </div>
     </>
   );

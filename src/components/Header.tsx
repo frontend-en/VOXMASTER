@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import Headroom from "react-headroom";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetFooter, SheetHeader, SheetTitle } from "./ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "./ui/sheet";
 import Menu from "lucide-react/dist/esm/icons/menu";
 import Music from "lucide-react/dist/esm/icons/music";
 
@@ -34,6 +41,7 @@ function useLockBody(lock: boolean) {
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   useLockBody(open);
   const firstLinkRef = useRef<HTMLButtonElement | null>(null);
 
@@ -52,16 +60,27 @@ export function Header() {
     }
   }, [open]);
 
+  // Тень и фон после скролла
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <Headroom
-      pinStart={0}
-      onPin={() => {}}
-      onUnpin={() => {}}
-      style={{ zIndex: 50 }} // поверх контента
-      // Headroom сам делает position: fixed, поэтому внутри header НЕ ставим fixed
-      className="headroom will-change-transform"
-    >
-      <header className="bg-background/80 backdrop-blur-md border-b transition-[box-shadow,backdrop-filter,background-color] duration-300">
+    <div className="sticky top-0 z-50">
+      <header
+        className={[
+          // Базовый фон
+          "border-b transition-[box-shadow,background-color,backdrop-filter] duration-300",
+          // Фоллбек: если нет backdrop-filter — полупрозрачный фон
+          "bg-background/90",
+          // Если браузер поддерживает backdrop-filter — используем блюр и чуть меньше непрозрачность
+          "supports-[backdrop-filter]:bg-background/70 supports-[backdrop-filter]:backdrop-blur-md",
+          scrolled ? "shadow-sm" : "shadow-none",
+        ].join(" ")}
+      >
         {/* Skip link */}
         <a
           href="#main"
@@ -74,9 +93,7 @@ export function Header() {
           <div className="flex items-center justify-between gap-3">
             {/* Branding */}
             <div className="flex items-center gap-2 min-w-0">
-              <span aria-hidden className="text-2xl leading-none">
-                🎤
-              </span>
+              <span aria-hidden className="text-2xl leading-none">🎤</span>
               <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 min-w-0">
                 <span className="font-bold text-lg truncate">VOXMASTER</span>
                 <span className="text-sm text-muted-foreground hidden lg:block">
@@ -126,8 +143,7 @@ export function Header() {
                     aria-expanded={open}
                     aria-controls="mobile-menu"
                   >
-                    <Menu className="h-5 w-5" />{" "}
-                    {/* только бургер — без второго крестика */}
+                    <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
 
@@ -137,13 +153,10 @@ export function Header() {
                   className="p-0 flex flex-col"
                   aria-label="Мобильная навигация"
                 >
-                  {/* Внутри SheetContent уже есть единый Close (крест) в правом верхнем углу */}
                   <SheetHeader className="border-b px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Music className="h-5 w-5" />
-                      <SheetTitle className="font-semibold">
-                        Навигация
-                      </SheetTitle>
+                      <SheetTitle className="font-semibold">Навигация</SheetTitle>
                     </div>
                   </SheetHeader>
 
@@ -158,8 +171,7 @@ export function Header() {
                             <button
                               ref={i === 0 ? firstLinkRef : undefined}
                               onClick={() => scrollToSection(item.id)}
-                              className="w-full text-left px-6 py-3 text-base hover:bg-muted focus:bg-muted 
-                             transition-colors focus:outline-none whitespace-nowrap"
+                              className="w-full text-left px-6 py-3 text-base hover:bg-muted focus:bg-muted transition-colors focus:outline-none whitespace-nowrap"
                             >
                               {item.label}
                             </button>
@@ -186,6 +198,6 @@ export function Header() {
           </div>
         </div>
       </header>
-    </Headroom>
+    </div>
   );
 }

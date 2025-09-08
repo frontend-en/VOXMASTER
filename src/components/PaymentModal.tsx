@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogClose,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -18,7 +19,6 @@ import {
 import Phone from "lucide-react/dist/esm/icons/phone";
 import UserRound from "lucide-react/dist/esm/icons/user-round";
 import CreditCard from "lucide-react/dist/esm/icons/credit-card";
-
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -104,27 +104,21 @@ export function PaymentModal({
     }
 
     setIsSubmitting(true);
-
     try {
-      console.log("Payment form data:", {
-        ...formData,
-        planTitle,
-        planPrice,
-      });
-
+      console.log("Payment form data:", { ...formData, planTitle, planPrice });
       alert(`Переход к оплате для ${planTitle || "выбранного тарифа"}`);
     } finally {
       setIsSubmitting(false);
-      handleClose();
+      handleClose(); // 👈 одного вызова достаточно
     }
   };
 
   const handleClose = () => {
-    if (!isSubmitting) {
-      setFormData({ name: "", contact: "" });
-      setErrors({});
-      onClose();
-    }
+    // если идёт сабмит — не закрываем
+    if (isSubmitting) return;
+    setFormData({ name: "", contact: "" });
+    setErrors({});
+    onClose();
   };
 
   const isFormValid =
@@ -134,8 +128,17 @@ export function PaymentModal({
     !errors.contact;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md w-full mx-4 sm:mx-auto bg-card/95 backdrop-blur-md border border-border/50 shadow-2xl">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
+      <DialogContent
+        className="max-w-md w-full mx-4 sm:mx-auto bg-card backdrop-blur-md border border-border/50 shadow-2xl"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -282,15 +285,19 @@ export function PaymentModal({
               </Tooltip>
             </TooltipProvider>
 
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleClose}
-              className="w-full sm:w-auto h-12 px-6 hover:bg-muted"
-              disabled={isSubmitting}
-            >
-              Отмена
-            </Button>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full sm:w-auto h-12 px-6 hover:bg-muted"
+                disabled={isSubmitting}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                Отмена
+              </Button>
+            </DialogClose>
           </div>
         </form>
       </DialogContent>
