@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     target: "esnext", // современный output
-    outDir: "build",
+    outDir: "dist",
     sourcemap: false, // выключить карты в проде (если не нужны)
     minify: "terser", // или 'terser' для ещё сильнее
     terserOptions: {
