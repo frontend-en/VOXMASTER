@@ -16,7 +16,7 @@ DB/tiktok_data/**
 DB/blogers/**
 scripts/DB/tiktok_data
 scripts/auth/.tiktok_profile/**
-public/**
+
 scripts/scrape/.tiktok_profile/**
 
 # Editor directories and files
