@@ -16,7 +16,7 @@ import Music from "lucide-react/dist/esm/icons/music";
 type NavItem = { id: string; label: string };
 const NAV: NavItem[] = [
   { id: "about", label: "Почему я" },
-  { id: "price", label: "Стоимость" },
+  // { id: "price", label: "Стоимость" },
   { id: "testimonials", label: "Отзывы" },
   { id: "faq", label: "FAQ" },
   { id: "book", label: "Запись" },
@@ -95,7 +95,7 @@ export function Header() {
             <div className="flex items-center gap-2 min-w-0">
               <span aria-hidden className="text-2xl leading-none">🎤</span>
               <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 min-w-0">
-                <span className="font-bold text-lg truncate">VOXMASTER</span>
+                <span className="font-bold text-lg truncate">voxcraft.studio</span>
                 <span className="text-sm text-muted-foreground hidden lg:block">
                   —
                 </span>
