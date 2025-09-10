@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
     "preview": "vite preview",
+    "build": "vite build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
