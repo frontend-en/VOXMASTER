@@ -1,8 +1,8 @@
-import { Suspense, lazy } from "react";
+import { lazy } from "react";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
 import { FreeDiagnostic } from "./components/FreeDiagnostic";
-// import { Pricing } from "./components/Pricing";
+import { Pricing } from "./components/Pricing";
 import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
 
@@ -39,9 +39,9 @@ export default function App() {
             <ContactForm />
           </section>
 
-          {/* <section id="price"> */}
-            {/* <Pricing /> */}
-          {/* </section> */}
+          <section id="price">
+            <Pricing />
+          </section>
 
           <section id="testimonials">
             <Testimonials />
