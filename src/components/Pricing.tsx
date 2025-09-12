@@ -28,7 +28,7 @@ export function Pricing() {
         {
           amount, // "3000.00" | "11000.00"
           description: planTitle, // "1 урок" | "Пакет 4 занятия"
-          returnUrl: window.location.origin + "/thank-you",
+          returnUrl: window.location.origin + "/thank-you.html",
           // опционально: попадёт в YooKassa -> потом в вебхук/телеграм
           metadata: { planTitle, source: "voxcraft.studio" },
         },
