@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Спасибо за оплату — voxcraft.studio</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Prose -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.10/dist/typography.min.css" />
+
+  <style>
+    /* Милые анимации ноток */
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(15deg); opacity: 0; }
+    }
+    .note {
+      animation: floatUp var(--t, 12s) linear infinite;
+      will-change: transform, opacity;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,.15));
+    }
+
+    /* Плавное появление карточки */
+    @keyframes popIn {
+      from { transform: translateY(8px) scale(.98); opacity: 0; }
+      to   { transform: translateY(0)   scale(1);    opacity: 1; }
+    }
+    .pop-in { animation: popIn .6s cubic-bezier(.16,1,.3,1) both; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-pink-50 via-rose-50 to-indigo-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-100 selection:bg-fuchsia-200/60 selection:text-fuchsia-900">
+
+  <!-- Фоновая «сцена» -->
+  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <!-- мягкие пятна -->
+    <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-fuchsia-300/40 blur-3xl dark:bg-fuchsia-500/20"></div>
+    <div class="absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-indigo-300/40 blur-3xl dark:bg-indigo-500/20"></div>
+    <!-- летающие нотки -->
+    <div class="absolute inset-0">
+      <span class="note absolute left-[8%] bottom-[-10%] text-2xl" style="--t: 13s;">🎵</span>
+      <span class="note absolute left-[22%] bottom-[-10%] text-xl" style="--t: 11s; animation-delay: .8s">🎶</span>
+      <span class="note absolute left-[36%] bottom-[-10%] text-2xl" style="--t: 14s; animation-delay: 1.6s">🎼</span>
+      <span class="note absolute left-[50%] bottom-[-10%] text-xl" style="--t: 12s; animation-delay: .4s">🎵</span>
+      <span class="note absolute left-[64%] bottom-[-10%] text-2xl" style="--t: 10s; animation-delay: 1s">🎶</span>
+      <span class="note absolute left-[78%] bottom-[-10%] text-xl" style="--t: 15s; animation-delay: .2s">🎼</span>
+      <span class="note absolute left-[90%] bottom-[-10%] text-2xl" style="--t: 12.5s; animation-delay: 1.2s">🎵</span>
+    </div>
+  </div>
+
+  <main class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <section class="pop-in rounded-3xl bg-white/80 backdrop-blur-xl p-6 sm:p-8 shadow-xl ring-1 ring-black/5 dark:bg-slate-900/70 dark:ring-white/10">
+      <!-- Верхний блок -->
+      <div class="flex items-start gap-4">
+        <div class="rounded-2xl bg-gradient-to-br from-fuchsia-500 to-indigo-500 p-3 text-white shadow-md">
+          <!-- Милейший микрофон -->
+          <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" class="drop-shadow">
+            <path fill="currentColor" d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Zm-7 0a1 1 0 1 0 2 0v-1a1 1 0 1 0-2 0v1Zm12 0a1 1 0 1 0 2 0v-1a1 1 0 1 0-2 0v1ZM11 19.92V22h2v-2.08A7.01 7.01 0 0 0 19 12h-2a5 5 0 1 1-10 0H5a7.01 7.01 0 0 0 6 7.92Z"/>
+          </svg>
+        </div>
+        <div class="grow">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Спасибо за оплату! <span class="align-middle">🎉</span>
+          </h1>
+          <p class="mt-1 text-slate-600 dark:text-slate-300">
+            Оплата прошла успешно. Мы уже получили уведомление и готовим для вас следующий шаг.
+          </p>
+        </div>
+      </div>
+
+      <!-- Что дальше -->
+      <article class="prose prose-slate dark:prose-invert mt-6 max-w-none">
+        <h3 class="!mt-0">Что дальше?</h3>
+        <ul>
+          <li>Мы свяжемся с вами в ближайшее время, чтобы согласовать расписание занятия.</li>
+          <li>Если у вас есть вопросы — смело пишите нам в <a href="https://t.me/GardeRik" target="_blank" rel="noreferrer">Telegram</a>.</li>
+        </ul>
+      </article>
+
+      <!-- Кнопки -->
+      <div class="mt-7 flex flex-col sm:flex-row gap-3">
+        <a href="/" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-fuchsia-500 to-indigo-500 px-5 py-3 text-white font-semibold shadow-md hover:shadow-lg transition">
+          Вернуться на главную
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Подставляем plan/amount из query-параметров: ?plan=4%20занятия&amount=11000
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const plan = params.get("plan");
+      const amount = params.get("amount");
+
+      if (plan) document.getElementById("plan").textContent = plan;
+      if (amount) {
+        const val = String(amount).replace(/[^\d.,]/g,"").replace(",",".");
+        const num = Number(val);
+        document.getElementById("amount").textContent =
+          isFinite(num) ? num.toLocaleString("ru-RU") + " ₽" : amount;
+      }
+    })();
+  </script>
+</body>
+</html>

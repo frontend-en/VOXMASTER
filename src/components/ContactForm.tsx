@@ -122,6 +122,7 @@ export function ContactForm() {
       `Здравствуйте! Хочу записаться на урок вокала.
 
 Имя: ${formData.name || "[не указано]"}
+Телефон: ${formData.contact || "[не указано]"}
 Цель: ${formData.goal || "[не указана]"}
 ${formData.comment ? "Комментарий: " + formData.comment : ""}`
     );
@@ -133,6 +134,7 @@ ${formData.comment ? "Комментарий: " + formData.comment : ""}`
       `Здравствуйте! Хочу записаться на урок вокала.
 
 Имя: ${formData.name || "[не указано]"}
+Телефон: ${formData.contact || "[не указано]"}
 Цель: ${formData.goal || "[не указана]"}
 ${formData.comment ? "Комментарий: " + formData.comment : ""}`
     );
