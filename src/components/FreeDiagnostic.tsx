@@ -1,18 +1,16 @@
+import { Calendar, Check, Gift, MessageCircle } from "lucide-react";
+import { scrollToElementById } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import Check from "lucide-react/dist/esm/icons/check";
-import Gift from "lucide-react/dist/esm/icons/gift";
-import Calendar from "lucide-react/dist/esm/icons/calendar";
-import MessageCircle from "lucide-react/dist/esm/icons/message-circle";
 
 export function FreeDiagnostic() {
+  const scrollToBooking = () => scrollToElementById("book");
+
   return (
     <section className="py-8 px-4 md:py-8 lg:py-8">
       <div className="max-w-4xl mx-auto">
-        {/* Центральная карточка предложения */}
         <Card className="relative border-2 border-secondary rounded-[18px] bg-secondary/5 shadow-lg">
-          {/* Декоративный badge */}
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
             <Badge className="bg-secondary text-secondary-foreground px-4 py-1">
               <Gift className="mr-1.5 h-3.5 w-3.5" />
@@ -25,13 +23,11 @@ export function FreeDiagnostic() {
               Бесплатная диагностика вокальных данных
             </CardTitle>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Узнайте свои сильные стороны и зоны роста за 20-30 минут. Никаких
-              обязательств — просто честная оценка ваших возможностей.
+              Узнайте свои сильные стороны и зоны роста за 20-30 минут. Никаких обязательств — просто честная оценка ваших возможностей.
             </p>
           </CardHeader>
 
           <CardContent className="pb-8">
-            {/* Что входит в диагностику */}
             <div className="mb-8">
               <h4 className="text-center mb-6 font-medium text-foreground">
                 Что вы получите:
@@ -70,16 +66,11 @@ export function FreeDiagnostic() {
               </div>
             </div>
 
-            {/* CTA кнопки */}
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <Button
                 size="lg"
                 className="flex-1 min-h-[48px] bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                onClick={() => {
-                  document
-                    .getElementById("book")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
+                onClick={scrollToBooking}
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 Записаться на диагностику
@@ -88,28 +79,21 @@ export function FreeDiagnostic() {
                 variant="outline"
                 size="lg"
                 className="flex-1 min-h-[48px] border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground"
-                onClick={() => {
-                  document
-                    .getElementById("book")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
+                onClick={scrollToBooking}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
                 Написать в WhatsApp
               </Button>
             </div>
 
-            {/* Дополнительная информация */}
             <div className="mt-6 text-center">
               <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-                Диагностика проходит онлайн в Microsoft Teams.
-                Продолжительность: 20-30 минут. Запись по желанию.
+                Диагностика проходит онлайн в Microsoft Teams. Продолжительность: 20-30 минут. Запись по желанию.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Дополнительный блок с гарантией */}
         <div className="mt-8 text-center">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
             <Gift className="mr-2 h-4 w-4" />

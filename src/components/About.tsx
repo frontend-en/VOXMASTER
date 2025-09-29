@@ -1,10 +1,9 @@
-import ExternalLink from "lucide-react/dist/esm/icons/external-link";
-import CheckCircle from "lucide-react/dist/esm/icons/check-circle";
+import { CheckCircle, ExternalLink } from "lucide-react";
+import { poster, poster1 } from "../assets";
+import { benefits, musicLinks } from "../lib/consts";
+import { ImageCarousel } from "./ImageCarousel";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { poster, poster1 } from "../assets";
-import { ImageCarousel } from "./ImageCarousel";
-import { benefits, musicLinks } from "../lib/consts";
 
 export function About() {
   return (
@@ -12,20 +11,14 @@ export function About() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-12">
           <h2 className="text-center mb-6 mx-auto">Ещё больше обо мне</h2>
-          <p className="">
-            Мы все устроены похоже: важнее понять, что и зачем мы делаем
-            голосом. На уроках я снимаю «туман», помогаю убрать зажимы и
-            формирую простые, безопасные мышечные привычки + понимание «что я
-            делаю сейчас».
+          <p>
+            Мы все устроены похоже: важнее понять, что и зачем мы делаем голосом. На уроках я снимаю «туман», помогаю убрать зажимы и формирую простые, безопасные мышечные привычки + понимание «что я делаю сейчас».
           </p>
           <p className="mt-4">
-            Атмосфера — лёгкая и уважительная. Работаем на ваших треках, чтобы
-            вы пели в нужном жанре и подстраивали тембр под задачу.
+            Атмосфера — лёгкая и уважительная. Работаем на ваших треках, чтобы вы пели в нужном жанре и подстраивали тембр под задачу.
           </p>
           <p className="mt-4">
-            Я действующий артист: пишу песни, выступаю и выпускаю музыку в
-            проекте синтеза театра и музыки “Танцы Сознания” — остаюсь «в
-            контексте» индустрии.
+            Я действующий артист: пишу песни, выступаю и выпускаю музыку в проекте синтеза театра и музыки “Танцы Сознания” — остаюсь «в контексте» индустрии.
           </p>
         </div>
 
@@ -33,9 +26,9 @@ export function About() {
           <div>
             <div className="mb-8">
               <div className="grid gap-4">
-                {benefits.map((benefit, index) => (
+                {benefits.map((benefit) => (
                   <div
-                    key={index}
+                    key={benefit}
                     className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg"
                   >
                     <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -48,18 +41,9 @@ export function About() {
             <div className="mt-8">
               <h4 className="mb-4">Музыкальные ссылки:</h4>
               <div className="flex flex-wrap gap-3">
-                {musicLinks.map((link, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="justify-start"
-                    asChild
-                  >
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                {musicLinks.map((link) => (
+                  <Button key={link.platform} variant="outline" className="justify-start" asChild>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
                       <link.icon className="mr-2 h-4 w-4" />
                       {link.platform}
                       <ExternalLink className="ml-2 h-3 w-3" />
@@ -72,14 +56,14 @@ export function About() {
 
           <div className="relative">
             <Card>
-              <CardContent className="p-0" style={{ paddingBottom: "0px" }}>
+              <CardContent className="p-0">
                 <ImageCarousel
                   images={[
                     { src: poster, alt: "Вокальный коуч в действии" },
                     { src: poster1, alt: "Урок: разбор дыхания и опоры" },
                   ]}
-                  autoPlayMs={4000} // можно поменять или убрать
-                  rounded="rounded-lg" // совпадает с вашим стилем
+                  autoPlayMs={4000}
+                  rounded="rounded-lg"
                 />
               </CardContent>
             </Card>

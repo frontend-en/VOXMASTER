@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import axios from "axios";
+import { Check, CreditCard, HelpCircle } from "lucide-react";
+import { PRICING_COPY } from "../lib/consts";
+import { normalizeAmount, scrollToElementById } from "../lib/utils";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -9,48 +12,56 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Check, CreditCard, HelpCircle } from "lucide-react";
-import { PRICING_COPY } from "../lib/consts";
-import { normalizeAmount } from "../lib/utils";
 
-const API_BASE = "https://nextjs-boilerplate-liard-omega-74.vercel.app";
+const PAYMENT_API_BASE =
+  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_PAYMENT_API) ||
+  "https://nextjs-boilerplate-liard-omega-74.vercel.app";
 
 export function Pricing() {
   const [isPaying, setIsPaying] = useState(false);
 
-  const handlePaymentClick = async (planTitle: string, planPrice: string) => {
-    if (isPaying) return;
-    setIsPaying(true);
-    try {
-      const amount = normalizeAmount(planPrice);
-      const { data } = await axios.post(
-        `${API_BASE}/api/create-payment`,
-        {
-          amount, // "3000.00" | "11000.00"
-          description: planTitle, // "1 урок" | "Пакет 4 занятия"
-          returnUrl: window.location.origin + "/thank-you.html",
-          // опционально: попадёт в YooKassa -> потом в вебхук/телеграм
-          metadata: { planTitle, source: "voxcraft.studio" },
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
+  const handlePaymentClick = useCallback(
+    async (planTitle: string, planPrice: string) => {
+      if (isPaying) return;
+      setIsPaying(true);
 
-      const url = data?.confirmation?.confirmation_url;
-      if (url) {
-        window.location.assign(url); // редирект на YooKassa
-      } else {
-        alert("Не удалось получить ссылку на оплату");
+      try {
+        const amount = normalizeAmount(planPrice);
+        const returnUrl =
+          typeof window !== "undefined"
+            ? `${window.location.origin}/thank-you.html`
+            : undefined;
+
+        const { data } = await axios.post(
+          `${PAYMENT_API_BASE}/api/create-payment`,
+          {
+            amount,
+            description: planTitle,
+            returnUrl,
+            metadata: { planTitle, source: "voxcraft.studio" },
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        const url = data?.confirmation?.confirmation_url;
+        if (url && typeof window !== "undefined") {
+          window.location.assign(url);
+        } else {
+          window.alert?.("Не удалось получить ссылку на оплату");
+        }
+      } catch (error) {
+        console.error(error);
+        window.alert?.("Ошибка при создании платежа");
+      } finally {
+        setIsPaying(false);
       }
-    } catch (e: any) {
-      console.error(e);
-      alert("Ошибка при создании платежа");
-    } finally {
-      setIsPaying(false);
-    }
-  };
+    },
+    [isPaying]
+  );
 
-  const scrollToBook = () =>
-    document.getElementById("book")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBook = useCallback(() => {
+    scrollToElementById("book");
+  }, []);
 
   return (
     <section
@@ -58,7 +69,6 @@ export function Pricing() {
       style={{ paddingTop: "calc(var(--header-height-mobile) + 24px)" }}
     >
       <div className="max-w-6xl mx-auto pricing-section">
-        {/* Кикер и заголовок */}
         <div className="text-center mb-8 md:mb-12">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm font-medium mb-4">
             {PRICING_COPY.kicker}
@@ -69,18 +79,11 @@ export function Pricing() {
           </p>
         </div>
 
-        {/* Сетка карточек */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 mb-12">
-          {PRICING_COPY.lessons.map((lesson, i) => (
+          {PRICING_COPY.lessons.map((lesson) => (
             <Card
               key={lesson.title}
-              className={[
-                "relative h-full rounded-[18px]",
-                lesson.featured
-                  ? "border-2 border-primary shadow-lg"
-                  : "border border-border",
-                lesson.className || "",
-              ].join(" ")}
+              className={["relative h-full rounded-[18px]", lesson.featured ? "border-2 border-primary shadow-lg" : "border border-border", lesson.className || ""].join(" ")}
             >
               {lesson.featured && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -102,16 +105,12 @@ export function Pricing() {
 
               <CardContent className="flex-1">
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-3 text-foreground">
-                    Что входит:
-                  </h4>
+                  <h4 className="text-sm font-medium mb-3 text-foreground">Что входит:</h4>
                   <ul className="space-y-2.5">
-                    {lesson.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
+                    {lesson.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">
-                          {f}
-                        </span>
+                        <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -128,18 +127,13 @@ export function Pricing() {
                 <div className="flex flex-col gap-3 w-full">
                   <Button
                     className="w-full min-h-[44px]"
-                    onClick={() =>
-                      handlePaymentClick(lesson.title, lesson.price)
-                    }
+                    onClick={() => handlePaymentClick(lesson.title, lesson.price)}
+                    disabled={isPaying}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
                     Оплатить урок
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full min-h-[44px]"
-                    onClick={scrollToBook}
-                  >
+                  <Button variant="outline" className="w-full min-h-[44px]" onClick={scrollToBook}>
                     <HelpCircle className="mr-2 h-4 w-4" />
                     Спросить об оплате
                   </Button>
@@ -149,19 +143,17 @@ export function Pricing() {
           ))}
         </div>
 
-        {/* Примечания */}
         <div className="bg-muted/20 rounded-lg p-4 md:mb-12 mb-8 md:p-6 border border-border/50">
           <h4 className="font-medium mb-3 text-foreground">
             {PRICING_COPY.notesTitle}
           </h4>
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
-            {PRICING_COPY.notes.map((n) => (
-              <p key={n}>{n}</p>
+            {PRICING_COPY.notes.map((note) => (
+              <p key={note}>{note}</p>
             ))}
           </div>
         </div>
 
-        {/* Пакеты */}
         <div className="bg-muted/30 rounded-[18px] p-4 sm:p-6 md:p-8">
           <div className="text-center mb-6 md:mb-8">
             <h3 className="mb-3 md:mb-4 mx-auto">
@@ -173,37 +165,31 @@ export function Pricing() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {PRICING_COPY.packsBlock.packs.map((p) => (
+            {PRICING_COPY.packsBlock.packs.map((pack) => (
               <div
-                key={p.title}
+                key={pack.title}
                 className="bg-background rounded-[18px] p-4 sm:p-5 md:p-6 border border-border shadow-sm"
               >
                 <div className="mb-4 sm:mb-5">
-                  <h4 className="mb-2">{p.title}</h4>
+                  <h4 className="mb-2">{pack.title}</h4>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-xl sm:text-2xl font-bold">
-                      {p.price}
-                    </span>
-                    {p.saveNote && (
+                    <span className="text-xl sm:text-2xl font-bold">{pack.price}</span>
+                    {pack.saveNote && (
                       <span className="text-xs sm:text-sm text-muted-foreground">
-                        {p.saveNote}
+                        {pack.saveNote}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">{p.tagline}</p>
+                  <p className="text-sm text-muted-foreground">{pack.tagline}</p>
                 </div>
 
                 <div className="mb-5 sm:mb-6">
-                  <h5 className="text-sm font-medium mb-3 text-foreground">
-                    Что получите:
-                  </h5>
+                  <h5 className="text-sm font-medium mb-3 text-foreground">Что получите:</h5>
                   <ul className="space-y-2 sm:space-y-2.5">
-                    {p.benefits.map((b) => (
-                      <li key={b} className="flex items-start gap-2">
+                    {pack.benefits.map((benefit) => (
+                      <li key={benefit} className="flex items-start gap-2">
                         <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">
-                          {b}
-                        </span>
+                        <span className="text-sm text-muted-foreground">{benefit}</span>
                       </li>
                     ))}
                   </ul>
@@ -212,22 +198,17 @@ export function Pricing() {
                 <div className="flex flex-col gap-2.5 sm:gap-3">
                   <Button
                     className="w-full min-h-[44px]"
-                    onClick={() => handlePaymentClick(p.title, p.price)}
+                    onClick={() => handlePaymentClick(pack.title, pack.price)}
+                    disabled={isPaying}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
                     <span className="sm:hidden">Выбрать</span>
-                    <span className="hidden sm:inline">Выбрать {p.title}</span>
+                    <span className="hidden sm:inline">Выбрать {pack.title}</span>
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full min-h-[44px]"
-                    onClick={scrollToBook}
-                  >
+                  <Button variant="outline" className="w-full min-h-[44px]" onClick={scrollToBook}>
                     <HelpCircle className="mr-2 h-4 w-4" />
                     <span className="sm:hidden">Записаться</span>
-                    <span className="hidden sm:inline">
-                      Записаться без оплаты
-                    </span>
+                    <span className="hidden sm:inline">Записаться без оплаты</span>
                   </Button>
                 </div>
               </div>

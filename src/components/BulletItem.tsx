@@ -1,6 +1,6 @@
 import * as React from "react";
-import Check from "lucide-react/dist/esm/icons/check";
 
+import { Check } from "lucide-react";
 interface BulletItemProps {
   children: React.ReactNode;
 }

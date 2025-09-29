@@ -1,8 +1,6 @@
 import { useState } from "react";
-import Play from "lucide-react/dist/esm/icons/play";
-import Loader2 from "lucide-react/dist/esm/icons/loader-2";
-import AlertTriangle from "lucide-react/dist/esm/icons/alert-triangle";
 
+import { AlertTriangle, Loader2, Play } from "lucide-react";
 /**
  * Rutube embed iframe.
  * Официальный формат: https://rutube.ru/play/embed/<video-id>/?p=null

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'motion/react';
-import Sun from "lucide-react/dist/esm/icons/sun";
-import Moon from "lucide-react/dist/esm/icons/moon";
 
 export function ThemeToggle() {
    const { theme, setTheme, resolvedTheme } = useTheme();
