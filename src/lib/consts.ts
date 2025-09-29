@@ -1,5 +1,4 @@
-import Music from "lucide-react/dist/esm/icons/music";
-import Play from "lucide-react/dist/esm/icons/play";
+import { Music, Play } from "lucide-react";
 
 export const testimonials = [
   {
