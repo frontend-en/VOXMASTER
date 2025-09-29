@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 
-type Slide = { src: string; alt?: string; className?: string };
+export type Slide = { src: string; alt?: string; className?: string };
 
 export function ImageCarousel({
   images,
