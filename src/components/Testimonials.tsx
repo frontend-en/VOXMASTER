@@ -23,6 +23,27 @@ import { testimonials } from "../lib/consts";
 const AUTO_PLAY_INTERVAL = 4000;
 const AUTO_RESUME_DELAY = 7000;
 
+
+
+const TESTIMONIALS_COPY = {
+  heading: "Отзывы учеников",
+  subheading: "Что говорят о занятиях мои ученики",
+  toggle: {
+    expand: "Показать больше",
+    collapse: "Показать меньше",
+    ariaExpand: "Показать полный текст отзыва",
+    ariaCollapse: "Скрыть полный текст отзыва",
+  },
+  navigation: {
+    group: "Навигация отзывов",
+    prevLabel: "Предыдущий отзыв",
+    nextLabel: "Следующий отзыв",
+    prevSr: "Назад",
+    nextSr: "Вперёд",
+    pagePrefix: "Показать отзывы страница ",
+  },
+} as const;
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
@@ -351,9 +372,9 @@ export function Testimonials() {
     <section className="py-8 lg:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="mb-4 mx-auto">Отзывы учеников</h2>
+          <h2 className="mb-4 mx-auto">{TESTIMONIALS_COPY.heading}</h2>
           <p className="text-muted-foreground mx-auto">
-            Что говорят о занятиях мои ученики
+            {TESTIMONIALS_COPY.subheading}
           </p>
         </div>
 
@@ -408,18 +429,18 @@ export function Testimonials() {
                               aria-controls={`testimonial-text-${index}`}
                               aria-label={
                                 isExpanded
-                                  ? "Скрыть полный текст отзыва"
-                                  : "Показать полный текст отзыва"
+                                  ? TESTIMONIALS_COPY.toggle.ariaCollapse
+                                  : TESTIMONIALS_COPY.toggle.ariaExpand
                               }
                             >
                               {isExpanded ? (
                                 <>
-                                  Показать меньше
+                                  {TESTIMONIALS_COPY.toggle.collapse}
                                   <ChevronUp className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5" />
                                 </>
                               ) : (
                                 <>
-                                  Показать больше
+                                  {TESTIMONIALS_COPY.toggle.expand}
                                   <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover:translate-y-0.5" />
                                 </>
                               )}
@@ -442,15 +463,15 @@ export function Testimonials() {
 
         {totalPages > 1 && (
           <div className="mt-8 sm:mt-12 flex flex-col items-center gap-6">
-            <div className="inline-flex items-center gap-3" role="group" aria-label="Навигация отзывов">
+            <div className="inline-flex items-center gap-3" role="group" aria-label={TESTIMONIALS_COPY.navigation.group}>
               <button
                 type="button"
                 onClick={handlePrev}
                 onKeyDown={(event) => handleButtonKeyDown(event, "prev")}
                 className="h-11 px-4 rounded-full border border-border/60 bg-background/70 hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background active:scale-95 transition"
-                aria-label="Предыдущий отзыв"
+                aria-label={TESTIMONIALS_COPY.navigation.prevLabel}
               >
-                <span className="sr-only">Назад</span>
+                <span className="sr-only">{TESTIMONIALS_COPY.navigation.prevSr}</span>
                 <ChevronLeft className="w-5 h-5" aria-hidden="true" />
               </button>
 
@@ -459,9 +480,9 @@ export function Testimonials() {
                 onClick={handleNext}
                 onKeyDown={(event) => handleButtonKeyDown(event, "next")}
                 className="h-11 px-4 rounded-full border border-border/60 bg-background/70 hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background active:scale-95 transition"
-                aria-label="Следующий отзыв"
+                aria-label={TESTIMONIALS_COPY.navigation.nextLabel}
               >
-                <span className="sr-only">Вперёд</span>
+                <span className="sr-only">{TESTIMONIALS_COPY.navigation.nextSr}</span>
                 <ChevronRight className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
@@ -478,7 +499,7 @@ export function Testimonials() {
                   className={`h-2.5 w-2.5 rounded-full transition-colors ${
                     dot === activeSlide ? "bg-primary" : "bg-border"
                   }`}
-                  aria-label={`Показать отзывы страница ${dot + 1}`}
+                  aria-label={`${TESTIMONIALS_COPY.navigation.pagePrefix}${dot + 1}`}
                   aria-current={dot === activeSlide}
                 />
               ))}

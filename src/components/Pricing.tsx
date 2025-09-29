@@ -17,6 +17,25 @@ const PAYMENT_API_BASE =
   (typeof process !== "undefined" && process.env.NEXT_PUBLIC_PAYMENT_API) ||
   "https://nextjs-boilerplate-liard-omega-74.vercel.app";
 
+const BOOK_SECTION_ID = "book";
+
+const PAYMENT_ALERTS = {
+  missingConfirmation: "Не удалось получить ссылку на оплату",
+  error: "Ошибка при создании платежа",
+} as const;
+
+const PRICING_LABELS = {
+  featuredBadge: "Рекомендация",
+  lessonIncludes: "Что входит:",
+  payLesson: "Оплатить урок",
+  askPayment: "Спросить об оплате",
+  packIncludes: "Что получите:",
+  chooseShort: "Выбрать",
+  choosePrefix: "Выбрать ",
+  enrollShort: "Записаться",
+  enrollFull: "Записаться без оплаты",
+} as const;
+
 export function Pricing() {
   const [isPaying, setIsPaying] = useState(false);
 
@@ -47,11 +66,11 @@ export function Pricing() {
         if (url && typeof window !== "undefined") {
           window.location.assign(url);
         } else {
-          window.alert?.("Не удалось получить ссылку на оплату");
+          window.alert?.(PAYMENT_ALERTS.missingConfirmation);
         }
       } catch (error) {
         console.error(error);
-        window.alert?.("Ошибка при создании платежа");
+        window.alert?.(PAYMENT_ALERTS.error);
       } finally {
         setIsPaying(false);
       }
@@ -60,7 +79,7 @@ export function Pricing() {
   );
 
   const scrollToBook = useCallback(() => {
-    scrollToElementById("book");
+    scrollToElementById(BOOK_SECTION_ID);
   }, []);
 
   return (
@@ -88,7 +107,7 @@ export function Pricing() {
               {lesson.featured && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-primary text-primary-foreground">
-                    Рекомендация
+                    {PRICING_LABELS.featuredBadge}
                   </Badge>
                 </div>
               )}
@@ -105,7 +124,9 @@ export function Pricing() {
 
               <CardContent className="flex-1">
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-3 text-foreground">Что входит:</h4>
+                  <h4 className="text-sm font-medium mb-3 text-foreground">
+                    {PRICING_LABELS.lessonIncludes}
+                  </h4>
                   <ul className="space-y-2.5">
                     {lesson.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
@@ -131,11 +152,11 @@ export function Pricing() {
                     disabled={isPaying}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Оплатить урок
+                    {PRICING_LABELS.payLesson}
                   </Button>
                   <Button variant="outline" className="w-full min-h-[44px]" onClick={scrollToBook}>
                     <HelpCircle className="mr-2 h-4 w-4" />
-                    Спросить об оплате
+                    {PRICING_LABELS.askPayment}
                   </Button>
                 </div>
               </CardFooter>
@@ -184,7 +205,9 @@ export function Pricing() {
                 </div>
 
                 <div className="mb-5 sm:mb-6">
-                  <h5 className="text-sm font-medium mb-3 text-foreground">Что получите:</h5>
+                  <h5 className="text-sm font-medium mb-3 text-foreground">
+                    {PRICING_LABELS.packIncludes}
+                  </h5>
                   <ul className="space-y-2 sm:space-y-2.5">
                     {pack.benefits.map((benefit) => (
                       <li key={benefit} className="flex items-start gap-2">
@@ -202,13 +225,13 @@ export function Pricing() {
                     disabled={isPaying}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
-                    <span className="sm:hidden">Выбрать</span>
-                    <span className="hidden sm:inline">Выбрать {pack.title}</span>
+                    <span className="sm:hidden">{PRICING_LABELS.chooseShort}</span>
+                    <span className="hidden sm:inline">{`${PRICING_LABELS.choosePrefix}${pack.title}`}</span>
                   </Button>
                   <Button variant="outline" className="w-full min-h-[44px]" onClick={scrollToBook}>
                     <HelpCircle className="mr-2 h-4 w-4" />
-                    <span className="sm:hidden">Записаться</span>
-                    <span className="hidden sm:inline">Записаться без оплаты</span>
+                    <span className="sm:hidden">{PRICING_LABELS.enrollShort}</span>
+                    <span className="hidden sm:inline">{PRICING_LABELS.enrollFull}</span>
                   </Button>
                 </div>
               </div>

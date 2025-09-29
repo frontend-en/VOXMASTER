@@ -4,6 +4,28 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 
+const FREE_DIAGNOSTIC_COPY = {
+  badge: "Бесплатно",
+  title: "Бесплатная диагностика вокальных данных",
+  lead:
+    "Узнайте свои сильные стороны и зоны роста за 20-30 минут. Никаких обязательств — просто честная оценка ваших возможностей.",
+  benefitsTitle: "Что вы получите:",
+  benefits: [
+    "Анализ текущего уровня техники дыхания",
+    "Оценка диапазона и тембральных особенностей",
+    "Выявление индивидуальных зажимов и блоков",
+    "Рекомендации по развитию голоса",
+    "Персональный план развития на 3-6 месяцев",
+  ],
+  ctas: {
+    primary: "Записаться на диагностику",
+    secondary: "Написать в WhatsApp",
+  },
+  infoNote:
+    "Диагностика проходит онлайн в Microsoft Teams. Продолжительность: 20-30 минут. Запись по желанию.",
+  guarantee: "Никаких скрытых платежей • Честная оценка • Полезные советы",
+} as const;
+
 export function FreeDiagnostic() {
   const scrollToBooking = () => scrollToElementById("book");
 
@@ -14,55 +36,34 @@ export function FreeDiagnostic() {
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
             <Badge className="bg-secondary text-secondary-foreground px-4 py-1">
               <Gift className="mr-1.5 h-3.5 w-3.5" />
-              Бесплатно
+              {FREE_DIAGNOSTIC_COPY.badge}
             </Badge>
           </div>
 
           <CardHeader className="text-center pt-8 pb-6">
             <CardTitle className="text-2xl md:text-3xl mb-3">
-              Бесплатная диагностика вокальных данных
+              {FREE_DIAGNOSTIC_COPY.title}
             </CardTitle>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Узнайте свои сильные стороны и зоны роста за 20-30 минут. Никаких обязательств — просто честная оценка ваших возможностей.
+              {FREE_DIAGNOSTIC_COPY.lead}
             </p>
           </CardHeader>
 
           <CardContent className="pb-8">
             <div className="mb-8">
               <h4 className="text-center mb-6 font-medium text-foreground">
-                Что вы получите:
+                {FREE_DIAGNOSTIC_COPY.benefitsTitle}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    Анализ текущего уровня техники дыхания
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    Оценка диапазона и тембральных особенностей
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    Выявление индивидуальных зажимов и блоков
-                  </span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    Рекомендации по развитию голоса
-                  </span>
-                </div>
-                <div className="flex items-start gap-3 md:col-span-2">
-                  <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-muted-foreground">
-                    Персональный план развития на 3-6 месяцев
-                  </span>
-                </div>
+                {FREE_DIAGNOSTIC_COPY.benefits.map((benefit, index) => (
+                  <div
+                    key={benefit}
+                    className={`flex items-start gap-3${index === FREE_DIAGNOSTIC_COPY.benefits.length - 1 ? " md:col-span-2" : ""}`}
+                  >
+                    <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-muted-foreground">{benefit}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -73,7 +74,7 @@ export function FreeDiagnostic() {
                 onClick={scrollToBooking}
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                Записаться на диагностику
+                {FREE_DIAGNOSTIC_COPY.ctas.primary}
               </Button>
               <Button
                 variant="outline"
@@ -82,13 +83,13 @@ export function FreeDiagnostic() {
                 onClick={scrollToBooking}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Написать в WhatsApp
+                {FREE_DIAGNOSTIC_COPY.ctas.secondary}
               </Button>
             </div>
 
             <div className="mt-6 text-center">
               <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-                Диагностика проходит онлайн в Microsoft Teams. Продолжительность: 20-30 минут. Запись по желанию.
+                {FREE_DIAGNOSTIC_COPY.infoNote}
               </p>
             </div>
           </CardContent>
@@ -97,7 +98,7 @@ export function FreeDiagnostic() {
         <div className="mt-8 text-center">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
             <Gift className="mr-2 h-4 w-4" />
-            Никаких скрытых платежей • Честная оценка • Полезные советы
+            {FREE_DIAGNOSTIC_COPY.guarantee}
           </div>
         </div>
       </div>

@@ -10,6 +10,22 @@ const CTA_TARGETS = {
   price: "price",
 } as const;
 
+const HERO_COPY = {
+  badge: "Пробный бесплатно • 1:1 менторство",
+  title: "Простыми словами о сложном вокале",
+  lead: [
+    "Без риска: пробный урок бесплатный. На нем мы аккуратно оценим стартовую точку и цели, подберём план и формат работы.",
+    "Если формат не ваш — честно порекомендую, как двигаться дальше. Без «магии» и тумана. Я ясно объясняю, показываю на примерах и даю упражнения, которые действительно двигают вперёд.",
+  ],
+  bullets: ["Индивидуально онлайн", "План между уроками", "Гибкий график"],
+  ctas: {
+    primary: "Записаться на пробный",
+    secondary: "Связаться в Telegram",
+    tertiary: "Смотреть стоимость",
+  },
+  trustNote: "10+ лет практики",
+} as const;
+
 export function Hero() {
   const scrollToBook = () => scrollToElementById(CTA_TARGETS.book);
   const scrollToPrice = () => scrollToElementById(CTA_TARGETS.price);
@@ -23,18 +39,25 @@ export function Hero() {
               variant="secondary"
               className="inline-flex px-4 py-2 bg-secondary/20 text-popover-foreground dark:text-secondary-foreground border-secondary rounded-full"
             >
-              Пробный бесплатно • 1:1 менторство
+              {HERO_COPY.badge}
             </Badge>
 
             <h1 className="text-[32px] sm:text-[38px] lg:text-[42px] leading-[1.05] font-medium hero-text-constraint text-foreground">
-              Простыми словами о сложном вокале
+              {HERO_COPY.title}
             </h1>
 
             <p className="text-[17px] leading-[1.7] text-muted-foreground hero-text-constraint">
-              Без риска: пробный урок бесплатный. На нем мы аккуратно оценим стартовую точку и цели, подберём план и формат работы.
-              <br />
-              <br />
-              Если формат не ваш — честно порекомендую, как двигаться дальше. Без «магии» и тумана. Я ясно объясняю, показываю на примерах и даю упражнения, которые действительно двигают вперёд.
+              {HERO_COPY.lead.map((paragraph, index) => (
+                <span key={paragraph}>
+                  {paragraph}
+                  {index < HERO_COPY.lead.length - 1 && (
+                    <>
+                      <br />
+                      <br />
+                    </>
+                  )}
+                </span>
+              ))}
             </p>
 
             <div className="lg:hidden">
@@ -42,9 +65,9 @@ export function Hero() {
             </div>
 
             <div className="bullet-grid">
-              <BulletItem>Индивидуально онлайн</BulletItem>
-              <BulletItem>План между уроками</BulletItem>
-              <BulletItem>Гибкий график</BulletItem>
+              {HERO_COPY.bullets.map((bullet) => (
+                <BulletItem key={bullet}>{bullet}</BulletItem>
+              ))}
             </div>
 
             <div className="flex flex-col gap-2.5">
@@ -54,7 +77,7 @@ export function Hero() {
                 onClick={scrollToBook}
               >
                 <Phone className="mr-2 h-4 w-4" />
-                Записаться на пробный
+                {HERO_COPY.ctas.primary}
               </Button>
 
               <Button
@@ -64,7 +87,7 @@ export function Hero() {
                 onClick={scrollToBook}
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Связаться в Telegram
+                {HERO_COPY.ctas.secondary}
               </Button>
 
               <button
@@ -73,12 +96,12 @@ export function Hero() {
                 onClick={scrollToPrice}
               >
                 <ArrowDown className="mr-1 h-3 w-3" />
-                Смотреть стоимость
+                {HERO_COPY.ctas.tertiary}
               </button>
             </div>
 
             <p className="text-sm text-muted-foreground leading-relaxed">
-              10+ лет практики
+              {HERO_COPY.trustNote}
             </p>
           </div>
 
