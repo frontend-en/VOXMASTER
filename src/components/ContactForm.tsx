@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
@@ -21,7 +21,24 @@ import { Checkbox } from "./ui/checkbox";
 import { MessageCircle, Phone } from "lucide-react";
 import { RequiredLabel } from "./ui/requiredLabel";
 
-const CONTACT_GOALS = [
+// ---- Типы ----
+interface ContactFormState {
+  name: string;
+  contact: string;
+  goal: string;
+  comment: string;
+  consent: boolean;
+}
+type ContactFormField = keyof ContactFormState;
+type Errors = Partial<Record<ContactFormField, string>>;
+
+// ---- Валидация ----
+const PHONE_RE =
+  /^(?:(?:\+?\d{1,3})?[\s.-]?)?(?:\(?\d{3,4}\)?[\s.-]?)?\d{3}[\s.-]?\d{2,4}[\s.-]?\d{2,4}$/;
+const TG_USER_RE = /^@?[a-zA-Z0-9_]{5,32}$/;
+const TG_LINK_RE = /^https?:\/\/t\.me\/[a-zA-Z0-9_]{5,32}(\/\d+)?$/i;
+
+const goals = [
   "Начать с нуля",
   "Петь смелее/чище",
   "Подготовка к записи/концерту",
@@ -29,229 +46,142 @@ const CONTACT_GOALS = [
   "Научиться писать музыку",
   "Научиться писать тексты",
   "Другое",
-] as const;
-
-const PHONE_RE =
-  /^(?:(?:\+?\d{1,3})?[\s.-]?)?(?:\(?\d{3,4}\)?[\s.-]?)?\d{3}[\s.-]?\d{2,4}[\s.-]?\d{2,4}$/;
-const TG_USER_RE = /^@?[a-zA-Z0-9_]{5,32}$/;
-const TG_LINK_RE = /^https?:\/\/t\.me\/[a-zA-Z0-9_]{5,32}(\/\d+)?$/i;
-
-const MESSENGER_ENDPOINTS = {
-  whatsapp: "https://wa.me/79277212376?text=",
-  telegram: "https://t.me/GardeRik?text=",
-} as const;
-
-type MessengerChannel = keyof typeof MESSENGER_ENDPOINTS;
-
-type ContactFormState = {
-  name: string;
-  contact: string;
-  goal: string;
-  comment: string;
-  consent: boolean;
-};
-
-type ContactFormField = keyof ContactFormState;
-type ContactFormErrors = Partial<Record<ContactFormField, string>>;
-
-const INITIAL_FORM_STATE: ContactFormState = {
-  name: "",
-  contact: "",
-  goal: "",
-  comment: "",
-  consent: false,
-};
-
-const CONTACT_FIELDS: ContactFormField[] = [
-  "name",
-  "contact",
-  "goal",
-  "comment",
-  "consent",
 ];
 
-const VALIDATORS: Record<
-  ContactFormField,
-  (value: ContactFormState[ContactFormField], state: ContactFormState) => string
-> = {
-  name: (value) => {
-    const trimmed = value.trim();
-    if (!trimmed) return "Укажите имя";
-    if (trimmed.length < 2) return "Имя слишком короткое";
-    if (trimmed.length > 60) return "Имя слишком длинное";
-    return "";
-  },
-  contact: (value) => {
-    const trimmed = value.trim();
-    if (!trimmed) return "Укажите телефон или Telegram";
-    const normalized = trimmed.replace(/\s+/g, "");
-    const sanitized = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
-    const isPhone = PHONE_RE.test(normalized);
-    const isTelegram = TG_LINK_RE.test(trimmed) || TG_USER_RE.test(sanitized);
-    if (!isPhone && !isTelegram) {
-      return "Неверный контакт. Пример: +7 999 123-45-67 или @username";
-    }
-    return "";
-  },
-  goal: (value) => (value ? "" : "Выберите цель"),
-  comment: (value) =>
-    value.length > 400 ? "Слишком длинный комментарий (до 400 символов)" : "",
-  consent: (value) =>
-    value ? "" : "Нужно согласие на обработку данных",
-};
-
-function buildMessengerMessage(state: ContactFormState) {
-  return encodeURIComponent(
-    `Здравствуйте! Хочу записаться на урок вокала.\n\nИмя: ${
-      state.name || "[не указано]"
-    }\nТелефон: ${state.contact || "[не указано]"}\nЦель: ${
-      state.goal || "[не указана]"
-    }\n${state.comment ? "Комментарий: " + state.comment : ""}`
-  );
+function validateName(v: string) {
+  const t = v.trim();
+  if (!t) return "Укажите имя";
+  if (t.length < 2) return "Имя слишком короткое";
+  if (t.length > 60) return "Имя слишком длинное";
+  return "";
+}
+function validateContact(v: string) {
+  const t = v.trim();
+  if (!t) return "Укажите телефон или Telegram";
+  const isPhone = PHONE_RE.test(t.replace(/\s+/g, ""));
+  const isTg =
+    TG_LINK_RE.test(t) || TG_USER_RE.test(t.startsWith("@") ? t.slice(1) : t);
+  if (!isPhone && !isTg)
+    return "Неверный контакт. Пример: +7 999 123-45-67 или @username";
+  return "";
+}
+function validateGoal(v: string) {
+  return v ? "" : "Выберите цель";
+}
+function validateComment(v: string) {
+  return v.length > 400
+    ? "Слишком длинный комментарий (до 400 символов)"
+    : "";
+}
+function validateConsent(v: boolean) {
+  return v ? "" : "Нужно согласие на обработку данных";
 }
 
-function openMessenger(channel: MessengerChannel, message: string) {
-  if (typeof window === "undefined") return;
-  const base = MESSENGER_ENDPOINTS[channel];
-  window.open(`${base}${message}`, "_blank", "noopener,noreferrer");
-}
-
-type AntiSpamResult =
-  | { ok: true }
-  | { ok: false; reason: "honeypot" | "too_fast" | "rate_limited" };
-
-function useContactForm() {
-  const [state, setState] = useState<ContactFormState>(INITIAL_FORM_STATE);
-  const [errors, setErrors] = useState<ContactFormErrors>({});
+export function ContactForm() {
+  const [formData, setFormData] = useState<ContactFormState>({
+    name: "",
+    contact: "",
+    goal: "",
+    comment: "",
+    consent: false,
+  });
+  const [errors, setErrors] = useState<Errors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [website, setWebsite] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
   const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
     startedAtRef.current = Date.now();
   }, []);
 
-  const updateField = useCallback(<T extends ContactFormField>(
-    field: T,
-    value: ContactFormState[T]
+  // --- Хелперы ---
+  const setField = <K extends keyof ContactFormState>(
+    key: K,
+    value: ContactFormState[K]
   ) => {
-    setState((prev) => {
-      const next = { ...prev, [field]: value };
-      setErrors((prevErrors) => {
-        if (!prevErrors[field]) return prevErrors;
-        const message = VALIDATORS[field](next[field], next);
-        if (message) {
-          if (prevErrors[field] === message) return prevErrors;
-          return { ...prevErrors, [field]: message };
-        }
-        const { [field]: _ignored, ...rest } = prevErrors;
-        return rest;
-      });
-      return next;
-    });
-  }, []);
+    setFormData((s) => ({ ...s, [key]: value }));
+  };
 
-  const touchField = useCallback((field: ContactFormField) => {
-    setState((prev) => {
-      setErrors((prevErrors) => {
-        const message = VALIDATORS[field](prev[field], prev);
-        if (message) {
-          if (prevErrors[field] === message) return prevErrors;
-          return { ...prevErrors, [field]: message };
-        }
-        if (!prevErrors[field]) return prevErrors;
-        const { [field]: _ignored, ...rest } = prevErrors;
-        return rest;
-      });
-      return prev;
-    });
-  }, []);
+  const touchField = (field: ContactFormField) => {
+    let msg = "";
+    if (field === "name") msg = validateName(formData.name);
+    if (field === "contact") msg = validateContact(formData.contact);
+    if (field === "goal") msg = validateGoal(formData.goal);
+    if (field === "comment") msg = validateComment(formData.comment);
+    if (field === "consent") msg = validateConsent(formData.consent);
+    setErrors((e) => ({ ...e, [field]: msg || undefined }));
+  };
 
-  const validateAll = useCallback(() => {
-    const nextErrors: ContactFormErrors = {};
-    CONTACT_FIELDS.forEach((field) => {
-      const message = VALIDATORS[field](state[field], state);
-      if (message) nextErrors[field] = message;
+  const validateAll = (): boolean => {
+    const nextErrors: Errors = {
+      name: validateName(formData.name),
+      contact: validateContact(formData.contact),
+      goal: validateGoal(formData.goal),
+      comment: validateComment(formData.comment),
+      consent: validateConsent(formData.consent),
+    };
+    Object.keys(nextErrors).forEach((k) => {
+      if (!(nextErrors as any)[k]) delete (nextErrors as any)[k];
     });
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
-  }, [state]);
-
-  const passAntiSpam = useCallback((): AntiSpamResult => {
-    if (website) return { ok: false, reason: "honeypot" };
-    if (Date.now() - startedAtRef.current < 2000) {
-      return { ok: false, reason: "too_fast" };
-    }
-    if (typeof window === "undefined") {
-      return { ok: true };
-    }
-    const key = "contactForm:lastSubmit";
-    const last = Number(window.localStorage.getItem(key) || 0);
-    if (Date.now() - last < 60_000) {
-      return { ok: false, reason: "rate_limited" };
-    }
-    window.localStorage.setItem(key, String(Date.now()));
-    return { ok: true };
-  }, [website]);
-
-  const handleMessenger = useCallback(
-    (channel: MessengerChannel) => {
-      setIsSubmitting(true);
-      try {
-        if (!validateAll()) return;
-        const anti = passAntiSpam();
-        if (!anti.ok) {
-          if (anti.reason === "too_fast") {
-            alert("Слишком быстро. Заполните форму честно 😊");
-          }
-          if (anti.reason === "rate_limited") {
-            alert("Слишком часто. Попробуйте через минуту.");
-          }
-          return;
-        }
-        const message = buildMessengerMessage(state);
-        openMessenger(channel, message);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [passAntiSpam, state, validateAll]
-  );
-
-  const isFormValid = useMemo(
-    () =>
-      CONTACT_FIELDS.every(
-        (field) => !VALIDATORS[field](state[field], state)
-      ),
-    [state]
-  );
-
-  return {
-    state,
-    errors,
-    isSubmitting,
-    isFormValid,
-    updateField,
-    touchField,
-    handleMessenger,
-    website,
-    setWebsite,
   };
-}
 
-export function ContactForm() {
-  const {
-    state,
-    errors,
-    isSubmitting,
-    isFormValid,
-    updateField,
-    touchField,
-    handleMessenger,
-    website,
-    setWebsite,
-  } = useContactForm();
+  // --- Антиспам ---
+  const passAntiSpam = () => {
+    if (website) return { ok: false, reason: "honeypot" } as const;
+    if (Date.now() - startedAtRef.current < 2000)
+      return { ok: false, reason: "too_fast" } as const;
+    const key = "contactForm:lastSubmit";
+    const last = Number(localStorage.getItem(key) || 0);
+    if (Date.now() - last < 60_000)
+      return { ok: false, reason: "rate_limited" } as const;
+    localStorage.setItem(key, String(Date.now()));
+    return { ok: true } as const;
+  };
 
+  // --- Действия ---
+  const openMessenger = (channel: "whatsapp" | "telegram") => {
+    const message = encodeURIComponent(
+      `Здравствуйте! Хочу записаться на урок вокала.\n\nИмя: ${
+        formData.name || "[не указано]"
+      }\nЦель: ${formData.goal || "[не указана]"}\n${
+        formData.comment ? "Комментарий: " + formData.comment : ""
+      }`
+    );
+    if (channel === "whatsapp") {
+      window.open(`https://wa.me/79277212376?text=${message}`, "_blank");
+    } else {
+      window.open(`https://t.me/GardeRik?text=${message}`, "_blank");
+    }
+  };
+
+  const handlePreSubmit = (action: "whatsapp" | "telegram") => {
+    setIsSubmitting(true);
+    try {
+      if (!validateAll()) return;
+      const anti = passAntiSpam();
+      if (!anti.ok) {
+        if (anti.reason === "too_fast")
+          alert("Слишком быстро. Заполните форму честно 😊");
+        if (anti.reason === "rate_limited")
+          alert("Слишком часто. Попробуйте через минуту.");
+        return;
+      }
+      openMessenger(action);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isFormValid =
+    !validateName(formData.name) &&
+    !validateContact(formData.contact) &&
+    !validateGoal(formData.goal) &&
+    !validateComment(formData.comment) &&
+    !validateConsent(formData.consent);
+
+  // --- JSX ---
   return (
     <section className="py-20 px-4 bg-muted/50">
       <div className="max-w-4xl mx-auto">
@@ -260,9 +190,13 @@ export function ContactForm() {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="shadow-sm border border-border/60">
-            <CardContent className="p-6 md:p-8">
-              <form className="space-y-6" noValidate>
+          <Card>
+            <CardContent className="p-8">
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="space-y-6"
+                noValidate
+              >
                 {/* honeypot */}
                 <div className="hidden">
                   <label htmlFor="website">Ваш сайт</label>
@@ -270,58 +204,58 @@ export function ContactForm() {
                     id="website"
                     name="website"
                     value={website}
-                    onChange={(event) => setWebsite(event.target.value)}
+                    onChange={(e) => setWebsite(e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <RequiredLabel htmlFor="name">Имя</RequiredLabel>
-                  <Input
-                    id="name"
-                    placeholder="Как можно к вам обращаться?"
-                    value={state.name}
-                    onChange={(event) => updateField("name", event.target.value)}
-                    onBlur={() => touchField("name")}
-                    aria-invalid={!!errors.name}
-                    aria-describedby={errors.name ? "name-error" : undefined}
-                  />
-                  {errors.name && (
-                    <p id="name-error" className="text-sm text-destructive">
-                      {errors.name}
-                    </p>
-                  )}
+                {/* Имя + Контакт */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <RequiredLabel htmlFor="name">Имя</RequiredLabel>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setField("name", e.target.value)}
+                      onBlur={() => touchField("name")}
+                      aria-invalid={!!errors.name}
+                      aria-describedby={errors.name ? "name-error" : undefined}
+                    />
+                    {errors.name && (
+                      <p id="name-error" className="text-sm text-destructive">
+                        {errors.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <RequiredLabel htmlFor="contact">Контакт</RequiredLabel>
+                    <Input
+                      id="contact"
+                      value={formData.contact}
+                      onChange={(e) => setField("contact", e.target.value)}
+                      onBlur={() => touchField("contact")}
+                      aria-invalid={!!errors.contact}
+                      aria-describedby={
+                        errors.contact ? "contact-error" : undefined
+                      }
+                    />
+                    {errors.contact && (
+                      <p
+                        id="contact-error"
+                        className="text-sm text-destructive"
+                      >
+                        {errors.contact}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <RequiredLabel htmlFor="contact">
-                    Телефон или Telegram
-                  </RequiredLabel>
-                  <Input
-                    id="contact"
-                    placeholder="+7 900 123-45-67 или @username"
-                    value={state.contact}
-                    onChange={(event) =>
-                      updateField("contact", event.target.value)
-                    }
-                    onBlur={() => touchField("contact")}
-                    aria-invalid={!!errors.contact}
-                    aria-describedby={
-                      errors.contact ? "contact-error" : undefined
-                    }
-                    autoComplete="tel"
-                  />
-                  {errors.contact && (
-                    <p id="contact-error" className="text-sm text-destructive">
-                      {errors.contact}
-                    </p>
-                  )}
-                </div>
-
+                {/* Цель */}
                 <div className="space-y-2">
                   <RequiredLabel htmlFor="goal">Цель</RequiredLabel>
                   <Select
-                    value={state.goal}
-                    onValueChange={(value) => updateField("goal", value)}
+                    value={formData.goal}
+                    onValueChange={(v) => setField("goal", v)}
                     onOpenChange={(open) => {
                       if (!open) touchField("goal");
                     }}
@@ -330,9 +264,9 @@ export function ContactForm() {
                       <SelectValue placeholder="Выберите цель" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONTACT_GOALS.map((goal) => (
-                        <SelectItem key={goal} value={goal}>
-                          {goal}
+                      {goals.map((g) => (
+                        <SelectItem key={g} value={g}>
+                          {g}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -342,25 +276,19 @@ export function ContactForm() {
                   )}
                 </div>
 
+                {/* Комментарий */}
                 <div className="space-y-2">
-                  <Label htmlFor="comment">Комментарий</Label>
+                  <Label htmlFor="comment" className="text-lg font-light">Комментарий</Label>
                   <Textarea
                     id="comment"
-                    placeholder="Коротко о вашем опыте и любимых песнях"
-                    value={state.comment}
-                    onChange={(event) =>
-                      updateField("comment", event.target.value)
-                    }
+                    value={formData.comment}
+                    onChange={(e) => setField("comment", e.target.value)}
                     onBlur={() => touchField("comment")}
                     rows={3}
-                    aria-invalid={!!errors.comment}
-                    aria-describedby={
-                      errors.comment ? "comment-error" : undefined
-                    }
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span id="comment-hint">Необязательно</span>
-                    <span>{state.comment.length}/400</span>
+                    <span>{formData.comment.length}/400</span>
                   </div>
                   {errors.comment && (
                     <p id="comment-error" className="text-sm text-destructive">
@@ -369,26 +297,28 @@ export function ContactForm() {
                   )}
                 </div>
 
-                <div className="flex items-start space-x-2 pt-2">
+                {/* Согласие */}
+                <div className="flex items-center space-x-2 pt-2">
                   <Checkbox
                     id="consent"
-                    checked={state.consent}
+                    checked={formData.consent}
                     onCheckedChange={(checked) =>
-                      updateField("consent", Boolean(checked))
+                      setField("consent", Boolean(checked))
                     }
                     onBlur={() => touchField("consent")}
                   />
-                  <RequiredLabel htmlFor="consent">
-                    Согласен(на) на обработку данных и условия переноса занятия
-                    (предупреждать за 24 ч)
+                  <RequiredLabel htmlFor="consent" style={{ flexDirection: "row-reverse", fontSize: "0.8rem" }} >
+                    Согласен(на) на обработку данных и условия переноса
+                    занятия (предупреждать за 24 ч)
                   </RequiredLabel>
                 </div>
                 {errors.consent && (
                   <p className="text-sm text-destructive">{errors.consent}</p>
                 )}
 
+                {/* Кнопки */}
                 <TooltipProvider delayDuration={200}>
-                  <div className="grid grid-cols-1 gap-3 pt-4">
+                  <div className="grid gap-3 pt-4">
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className="w-full">
@@ -397,7 +327,7 @@ export function ContactForm() {
                             variant="outline"
                             className="w-full"
                             disabled={!isFormValid || isSubmitting}
-                            onClick={() => handleMessenger("whatsapp")}
+                            onClick={() => handlePreSubmit("whatsapp")}
                           >
                             <Phone className="mr-2 h-4 w-4" />
                             Написать в WhatsApp
@@ -405,9 +335,8 @@ export function ContactForm() {
                         </span>
                       </TooltipTrigger>
                       {!isFormValid && (
-                        <TooltipContent className="max-w-xs text-sm leading-relaxed">
-                          Пожалуйста, заполните все обязательные поля и
-                          подтвердите согласие — тогда кнопка станет доступна.
+                        <TooltipContent>
+                          Заполните все обязательные поля
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -418,7 +347,7 @@ export function ContactForm() {
                             type="button"
                             className="w-full"
                             disabled={!isFormValid || isSubmitting}
-                            onClick={() => handleMessenger("telegram")}
+                            onClick={() => handlePreSubmit("telegram")}
                           >
                             <MessageCircle className="mr-2 h-4 w-4" />
                             Написать в Telegram
@@ -426,9 +355,8 @@ export function ContactForm() {
                         </span>
                       </TooltipTrigger>
                       {!isFormValid && (
-                        <TooltipContent className="max-w-xs text-sm leading-relaxed">
-                          Заполните имя, контакт, цель и согласие, чтобы
-                          продолжить в Telegram.
+                        <TooltipContent>
+                          Заполните все обязательные поля
                         </TooltipContent>
                       )}
                     </Tooltip>
