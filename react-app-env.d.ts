@@ -18,3 +18,8 @@ declare module "lucide-react/dist/esm/icons/*" {
   const Icon: FC<SVGProps<SVGSVGElement>>;
   export default Icon;
 }
+
+declare module "*.webp" {
+  const value: string;
+  export default value;
+}

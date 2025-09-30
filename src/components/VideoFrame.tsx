@@ -1,6 +1,7 @@
-import { useState } from "react";
-
+import { useState, useCallback } from "react";
 import { AlertTriangle, Loader2, Play } from "lucide-react";
+import videoPoster from "../assets/images/videoposter.webp";
+
 /**
  * Rutube embed iframe.
  * Официальный формат: https://rutube.ru/play/embed/<video-id>/?p=null
@@ -13,25 +14,41 @@ export function VideoFrame() {
   const [mounted, setMounted] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const start = () => {
+  const start = useCallback(() => {
     setErr(null);
     setLoading(true);
     setMounted(true);
-  };
+  }, []);
+
+  const iframeSrc =
+    RUTUBE_EMBED_URL +
+    (RUTUBE_EMBED_URL.includes("?") ? "&" : "?") +
+    "autoplay=1";
 
   return (
     <div className="relative w-full aspect-video bg-card border border-border/20 rounded-[18px] overflow-hidden">
+      {/* Постер видео */}
+      {!mounted && (
+        <img
+          src={videoPoster}
+          alt="Превью видео"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+        />
+      )}
+
       {/* iframe Rutube — монтируем только по клику */}
       {mounted && (
         <iframe
           className="absolute inset-0 w-full h-full"
           title="Видео: как проходят уроки"
-          src={
-            RUTUBE_EMBED_URL +
-            (RUTUBE_EMBED_URL.includes("?") ? "&" : "?") +
-            "autoplay=1"
-          }
+          src={iframeSrc}
+          // ✅ autoplay заработает сразу после первого клика
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowFullScreen
+          // Safari/iOS требует playsinline, иначе видео уходит в нативный плеер
+          // @ts-expect-error
+          playsInline
           onLoad={() => setLoading(false)}
           onError={() => {
             setLoading(false);
@@ -65,7 +82,7 @@ export function VideoFrame() {
       {/* Ошибка + fallback */}
       {err && (
         <div className="absolute bottom-2 left-2 right-2 text-[13px] text-red-200 bg-black/55 rounded-md px-2 py-1 flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4" />
+          <AlertTriangle className="w-4 h-4 shrink-0" />
           <span className="flex-1">{err}</span>
           <a
             className="underline"
