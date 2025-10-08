@@ -5,6 +5,7 @@ import { FreeDiagnostic } from "./components/FreeDiagnostic";
 import { Pricing } from "./components/Pricing";
 import { ContactForm } from "./components/ContactForm";
 import { Footer } from "./components/Footer";
+import { SpecialServices } from "./components/SpecialServices";
 
 // ✅ lazy imports
 const About = lazy(() =>
@@ -41,6 +42,10 @@ export default function App() {
 
           <section id="price">
             <Pricing />
+          </section>
+          
+          <section id="specialPrice">
+            <SpecialServices />
           </section>
 
           <section id="testimonials">

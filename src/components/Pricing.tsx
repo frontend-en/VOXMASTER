@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import axios from "axios";
+import { useCallback } from "react";
 import { Check, CreditCard, HelpCircle } from "lucide-react";
 import { PRICING_COPY } from "../lib/consts";
-import { normalizeAmount, scrollToElementById } from "../lib/utils";
+import { scrollToElementById } from "../lib/utils";
+import { usePayment } from "../hooks/usePayment";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -13,16 +13,7 @@ import {
 } from "./ui/card";
 import { Badge } from "./ui/badge";
 
-const PAYMENT_API_BASE =
-  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_PAYMENT_API) ||
-  "https://nextjs-boilerplate-liard-omega-74.vercel.app";
-
 const BOOK_SECTION_ID = "book";
-
-const PAYMENT_ALERTS = {
-  missingConfirmation: "Не удалось получить ссылку на оплату",
-  error: "Ошибка при создании платежа",
-} as const;
 
 const PRICING_LABELS = {
   featuredBadge: "Рекомендация",
@@ -37,45 +28,12 @@ const PRICING_LABELS = {
 } as const;
 
 export function Pricing() {
-  const [isPaying, setIsPaying] = useState(false);
+  const { isPaying, handlePayment } = usePayment();
 
   const handlePaymentClick = useCallback(
-    async (planTitle: string, planPrice: string) => {
-      if (isPaying) return;
-      setIsPaying(true);
-
-      try {
-        const amount = normalizeAmount(planPrice);
-        const returnUrl =
-          typeof window !== "undefined"
-            ? `${window.location.origin}/thank-you.html`
-            : undefined;
-
-        const { data } = await axios.post(
-          `${PAYMENT_API_BASE}/api/create-payment`,
-          {
-            amount,
-            description: planTitle,
-            returnUrl,
-            metadata: { planTitle, source: "voxcraft.studio" },
-          },
-          { headers: { "Content-Type": "application/json" } }
-        );
-
-        const url = data?.confirmation?.confirmation_url;
-        if (url && typeof window !== "undefined") {
-          window.location.assign(url);
-        } else {
-          window.alert?.(PAYMENT_ALERTS.missingConfirmation);
-        }
-      } catch (error) {
-        console.error(error);
-        window.alert?.(PAYMENT_ALERTS.error);
-      } finally {
-        setIsPaying(false);
-      }
-    },
-    [isPaying]
+    (planTitle: string, planPrice: string) =>
+      handlePayment({ title: planTitle, price: planPrice }),
+    [handlePayment]
   );
 
   const scrollToBook = useCallback(() => {
